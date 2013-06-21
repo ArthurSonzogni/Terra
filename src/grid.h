@@ -1,7 +1,9 @@
-#include <vector>
 #include <iostream>
 #include <SFML/OpenGL.hpp>
 #include "color_manager.h"
+#include <list>
+
+using namespace std;
 
 class Grid
 {
@@ -23,11 +25,12 @@ class Grid
 		void free();
 		
 		bool isPositionValid(int x, int y, int z);
-		bool getNfilled(int x, int y, int z);
-		bool getNActive(int x, int y, int z);
+		int getNfilled(int x, int y, int z);
+		int getNActive(int x, int y, int z);
 		void update(int x,int y,int z);
 	
 		GLuint display_list;
+		bool display_list_is_generated;
 		void generate_display_list();
 		void generate_display_list(int x,int y, int z);
 

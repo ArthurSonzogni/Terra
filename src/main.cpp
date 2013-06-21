@@ -9,6 +9,11 @@ int main()
     window.setVerticalSyncEnabled(true);
 	Grid g;
 	g.set_dimension(10,10,10);
+	g.block_active(3,3,3,255,255,255);
+	g.block_active(4,3,3,255,255,255);
+	g.block_active(5,3,3,255,255,255);
+	g.block_active(6,3,3,255,255,255);
+	g.block_active(5,4,3,255,255,255);
     // chargement des ressources, initialisation des états OpenGL, ...
 
     // la boucle principale

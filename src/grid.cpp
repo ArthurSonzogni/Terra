@@ -1,4 +1,5 @@
 #include "grid.h"
+#include "semi_block_generator.h"
 
 Grid::Grid():
 	dimx(0),
@@ -136,15 +137,29 @@ bool Grid::isPositionValid(int x, int y, int z)
 			z<=dimz;
 }
 
-bool Grid::getNfilled(int x, int y, int z)
+int Grid::getNfilled(int x, int y, int z)
 {
 	int n=0;
-	if (filled[x-1][y][z]) ++n;
-	if (filled[x+1][y][z]) ++n;
-	if (filled[x][y-1][z]) ++n;
-	if (filled[x][y+1][z]) ++n;
-	if (filled[x][y][z-1]) ++n;
-	if (filled[x][y][z+1]) ++n;
+	if (filled[x-1][y][z]) n+=1;
+	if (filled[x+1][y][z]) n+=2;
+	if (filled[x][y-1][z]) n+=4;
+	if (filled[x][y+1][z]) n+=8;
+	if (filled[x][y][z-1]) n+=16;
+	if (filled[x][y][z+1]) n+=32;
+	return n;
+}
+
+int Grid::getNActive(int x, int y, int z)
+{
+	int n=0;
+	if (active[x-1][y-1][z-1]) n+=1;
+	if (active[x-1][y-1][z-1]) n+=1;
+	if (active[x-1][y-1][z-1]) n+=1;
+	if (active[x-1][y-1][z-1]) n+=1;
+	if (active[x-1][y-1][z-1]) n+=1;
+	if (active[x-1][y-1][z-1]) n+=1;
+	if (active[x-1][y-1][z-1]) n+=1;
+	if (active[x-1][y-1][z-1]) n+=1;
 	return n;
 }
 
@@ -196,8 +211,15 @@ void Grid::block_delete(int x, int y, int z)
 
 void Grid::draw()
 {
+	static float angle=0;
+
+	angle+=0.6;
+	glLoadIdentity();
+	glRotatef(angle,1,0.1,0);
+	glRotatef(angle,0.1,1.0,0);
 	if (display_list==0)
 		generate_display_list();
+
 	glCallList(display_list);
 }
 
@@ -208,32 +230,45 @@ void Grid::generate_display_list()
 	if (display_list!=0)
 		glDeleteLists(display_list,1);
 	
+	cout<<"regenerate"<<endl;
+	display_list=glGenLists(1);
 	glLoadIdentity();
 	glNewList(display_list,GL_COMPILE);
+	glScalef(0.05,0.05,0.05);
 	glPushMatrix();
 		for(x=1;x<=dimx;++x)
-		for(y=1;y<=dimy;++y)
-		for(z=1;z<=dimz;++z)
 		{
-			glTranslatef(0.01f,0.f,0.f);
-			generate_display_list(x,y,z);
+			glPushMatrix();
+			for(y=1;y<=dimy;++y)
+			{
+				glPushMatrix();
+				for(z=1;z<=dimz;++z)
+				{
+					glTranslatef(0.01f,0.f,0.f);
+					generate_display_list(x,y,z);
+					glTranslatef(0.f,0.f,1.f);
+				}
+				glPopMatrix();
+				glTranslatef(0.f,1.f,0.f);
+			}
+			glPopMatrix();
+			glTranslatef(1.f,0.f,0.f);
 		}
-
 	glPopMatrix();
 	glEndList();;
+	
 }
 
 void Grid::generate_display_list(int x,int y, int z)
 {
-	glBegin(GL_TRIANGLES);
-		glColor3f(1.0, 1.0, 1.0); glVertex2f(0.0, 0.9);
-		glColor3f(1.0, 0.0, 0.0); glVertex2f(-0.5, 0.3);
-		glColor3f(0.0, 1.0, 0.0); glVertex2f(0.5, 0.3);
-	glEnd();
-	glBegin(GL_QUADS);
-		glColor3f(1.0, 0.0, 0.0); glVertex2f(-0.5, -0.8);
-		glColor3f(0.0, 1.0, 0.0); glVertex2f(0.5, -0.8);
-		glColor3f(0.0, 1.0, 0.0); glVertex2f(0.5, 0.3);
-		glColor3f(1.0, 0.0, 0.0); glVertex2f(-0.5, 0.3);
-	glEnd();
+	if (filled[x][y][z])
+	{
+		glBegin(GL_QUADS);
+			glColor3f(1.0, 1.0, 1.0); glVertex2f(0.f,0.f);
+			glColor3f(0.0, 0.0, 0.0); glVertex2f(1.f,0.f);
+			glColor3f(1.0, 1.0, 1.0); glVertex2f(1.f,1.f);
+			glColor3f(0.0, 0.0, 0.0); glVertex2f(0.f,1.f);
+		glEnd();
+	}
 }
+
