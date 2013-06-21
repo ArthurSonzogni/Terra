@@ -152,14 +152,14 @@ int Grid::getNfilled(int x, int y, int z)
 int Grid::getNActive(int x, int y, int z)
 {
 	int n=0;
-	if (active[x-1][y-1][z-1]) n+=1;
-	if (active[x-1][y-1][z-1]) n+=1;
-	if (active[x-1][y-1][z-1]) n+=1;
-	if (active[x-1][y-1][z-1]) n+=1;
-	if (active[x-1][y-1][z-1]) n+=1;
-	if (active[x-1][y-1][z-1]) n+=1;
-	if (active[x-1][y-1][z-1]) n+=1;
-	if (active[x-1][y-1][z-1]) n+=1;
+	if (active[x-1][y-1][z-1])	n+=1;
+	if (active[x-1][y-1][z])	n+=2;
+	if (active[x-1][y][z-1])	n+=4;
+	if (active[x-1][y][z])		n+=8;
+	if (active[x][y-1][z-1])	n+=16;
+	if (active[x][y-1][z])		n+=32;
+	if (active[x][y][z-1])		n+=64;
+	if (active[x][y][z])		n+=128;
 	return n;
 }
 
@@ -261,14 +261,25 @@ void Grid::generate_display_list()
 
 void Grid::generate_display_list(int x,int y, int z)
 {
+	int i,j,k;
 	if (filled[x][y][z])
 	{
-		glBegin(GL_QUADS);
-			glColor3f(1.0, 1.0, 1.0); glVertex2f(0.f,0.f);
-			glColor3f(0.0, 0.0, 0.0); glVertex2f(1.f,0.f);
-			glColor3f(1.0, 1.0, 1.0); glVertex2f(1.f,1.f);
-			glColor3f(0.0, 0.0, 0.0); glVertex2f(0.f,1.f);
-		glEnd();
+		glColor3f(1.0, 1.0, 1.0);
+		i=getNActive(x,y,z);
+		for(j=0;j<semi_block_n_face[i];++j)
+		{
+			glBegin(GL_TRIANGLES);
+			for(k=0;k<3;k++)
+			{
+				int face=semi_block_face[i][3*j+k];
+				glVertex3f(
+						semi_block_vertice[i][3*face],
+						semi_block_vertice[i][3*face+1],
+						semi_block_vertice[i][3*face+2]
+				);
+			}
+			glEnd();
+		}
 	}
 }
 

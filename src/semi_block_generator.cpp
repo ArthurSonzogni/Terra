@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace std;
 
-float* semi_block_vertice[3*256];
+float* semi_block_vertice[256];
 int semi_block_n_vertice[256];
 int* semi_block_face[256];
 int semi_block_n_face[256];
@@ -18,7 +18,6 @@ class semi_block_generator_filler
 
 semi_block_generator_filler::semi_block_generator_filler()
 {
-	cout<<"je charge"<<endl;
 	float all_vertices[3*8]=
 	{
 		0.f,0.f,0.f,
@@ -68,16 +67,16 @@ semi_block_generator_filler::semi_block_generator_filler()
 		Chull3D chull(vertices,k);
 		chull.compute();
 		chull.get_convex_hull(
-				semi_block_vertice+3*i,
+				semi_block_vertice+i,
 				semi_block_n_vertice+i,
 				semi_block_face+i,
 				semi_block_n_face+i
 		);
 		// affichage
-		cout<<endl;
+		/*cout<<endl;
 		cout<<"i="<<i<<endl;
 		cout<<"nb_vertice="<<semi_block_n_vertice[i]<<endl;
-		cout<<"nb_face="<<semi_block_n_face[i]<<endl;
+		cout<<"nb_face="<<semi_block_n_face[i]<<endl;*/
 	}
 }
 
