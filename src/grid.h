@@ -14,8 +14,7 @@ class Grid
 		
 		bool is_initiate;
 		 
-		bool ***active;
-		bool ***filled;
+		int ***filled;
 		float ****color; 	
 		
 		Color_manager color_manager;

@@ -9,8 +9,51 @@ int main()
     window.setVerticalSyncEnabled(true);
 	Grid g;
 	g.set_dimension(10,10,10);
-	g.block_active(3,3,3,255,255,255);
+	
+	g.block_active(2,1,1,255,255,255);
+	g.block_active(1,2,1,255,255,255);
+	g.block_active(1,1,2,255,255,255);
+
+	g.block_semi_active(1,1,1,255,255,255);
+	g.block_semi_active(2,2,1,255,255,255);
+	g.block_semi_active(1,2,2,255,255,255);
+	g.block_semi_active(2,1,2,255,255,255);
+	g.block_semi_active(2,2,2,255,255,255);
+	//g.block_semi_active(,255,255,255);
     // chargement des ressources, initialisation des états OpenGL, ...
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_LIGHTING);
+	glFrontFace(GL_CW);
+	
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
+	glEnable(GL_NORMALIZE);
+	glShadeModel(GL_SMOOTH);
+
+
+    //Add ambient light
+	GLfloat ambientColor[] = {0.3f, 0.3f, 0.3f, 1.0f};
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
+
+	//Add positioned light
+	GLfloat lightPos0[] = {0.f,10.f,0.0f, 1.0f};
+	GLfloat lightColor0[] = {1.0f, 0.5f, 0.5f, 1.0f};
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
+
+	//Add directed light
+	GLfloat lightColor1[] = {0.5f, 0.5f, 0.5f, 1.6f}; //Color (0.5, 0.2, 0.2)
+
+	//Coming from the direction (-1, 0.5, 0.5)
+	GLfloat lightPos1[] = {-1.0f, 0.5f, 0.5f, 0.0f};
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightColor1);
+	glLightfv(GL_LIGHT1, GL_POSITION, lightPos1);
+	
+
+
+	glEnable(GL_NORMALIZE);
 
     // la boucle principale
     bool running = true;

@@ -6,7 +6,6 @@ Grid::Grid():
 	dimy(0),
 	dimz(0),
 	is_initiate(false),
-	active(NULL),
 	filled(NULL),
 	color(NULL),
 	color_manager(),
@@ -22,17 +21,6 @@ void Grid::free()
 	if (is_initiate)
 	{
 		is_initiate=false;	
-
-		// free active
-		for(int x=0;x<=dimx;++x)
-		{
-			for(int y=0;y<=dimy;++y)
-			{
-				delete[] active[x][y];
-			}
-			delete[] active[x];
-		}
-		delete[] active;
 
 		// free filled
 		for(int x=0;x<=1+dimx;++x)
@@ -63,34 +51,18 @@ void Grid::initiate()
 {
 	if (is_initiate)
 		free();
-	
-	// initiate active point
-	active=new bool**[dimx+1];
-	for(int x=0;x<=dimx;++x)
-	{
-		active[x]=new bool*[dimy+1];
-		for(int y=0;y<=dimy;++y)
-		{
-			active[x][y]=new bool[dimz+1];
-			for(int z=0;z<=dimz;++z)
-			{
-				active[x][y][z]=false;
-			}
-		}
-	}
-	
 
 	// initiate filled
-	filled=new bool**[dimx+2];
+	filled=new int**[dimx+2];
 	for(int x=0;x<=1+dimx;++x)
 	{
-		filled[x]=new bool*[dimy+2];
+		filled[x]=new int*[dimy+2];
 		for(int y=0;y<=1+dimy;++y)
 		{
-			filled[x][y]=new bool[dimz+2];
+			filled[x][y]=new int[dimz+2];
 			for(int z=0;z<=1+dimz;++z)
 			{
-				filled[x][y][z]=false;
+				filled[x][y][z]=0;
 			}
 		}
 	}
@@ -137,32 +109,6 @@ bool Grid::isPositionValid(int x, int y, int z)
 			z<=dimz;
 }
 
-int Grid::getNfilled(int x, int y, int z)
-{
-	int n=0;
-	if (filled[x-1][y][z]) n+=1;
-	if (filled[x+1][y][z]) n+=2;
-	if (filled[x][y-1][z]) n+=4;
-	if (filled[x][y+1][z]) n+=8;
-	if (filled[x][y][z-1]) n+=16;
-	if (filled[x][y][z+1]) n+=32;
-	return n;
-}
-
-int Grid::getNActive(int x, int y, int z)
-{
-	int n=0;
-	if (active[x-1][y-1][z-1])	n+=1;
-	if (active[x-1][y-1][z])	n+=2;
-	if (active[x-1][y][z-1])	n+=4;
-	if (active[x-1][y][z])		n+=8;
-	if (active[x][y-1][z-1])	n+=16;
-	if (active[x][y-1][z])		n+=32;
-	if (active[x][y][z-1])		n+=64;
-	if (active[x][y][z])		n+=128;
-	return n;
-}
-
 void Grid::update(int x,int y,int z)
 {
 	if (filled[x][y][z])
@@ -172,40 +118,42 @@ void Grid::update(int x,int y,int z)
 }
 
 
-void Grid::block_semi_active(int x, int y, int z, int r, int g, int b)
+void Grid::block_semi_active(int xx, int yy, int zz, int r, int g, int b)
 {
-	if (isPositionValid(x,y,z))
+	if (isPositionValid(xx,yy,zz))
 	{
-		filled[x][y][z]=true;
+		filled[xx][yy][zz]=0;
+		int z=filled[xx][yy][zz-1];
+		int Z=filled[xx][yy][zz+1];
+		int y=filled[xx][yy-1][zz];
+		int Y=filled[xx][yy+1][zz];
+		int x=filled[xx-1][yy][zz];
+		int X=filled[xx+1][yy][zz];
+		int n=0;
+		if (x&VERTICE_Xyz || y&VERTICE_xYz || z&VERTICE_xyZ) n|=VERTICE_xyz;
+		if (x&VERTICE_XyZ || y&VERTICE_xYZ || Z&VERTICE_xyz) n|=VERTICE_xyZ;
+		if (x&VERTICE_XYz || Y&VERTICE_xyz || z&VERTICE_xYZ) n|=VERTICE_xYz;
+		if (x&VERTICE_XYZ || Y&VERTICE_xyZ || Z&VERTICE_xYz) n|=VERTICE_xYZ;
+		if (X&VERTICE_xyz || y&VERTICE_XYz || z&VERTICE_XyZ) n|=VERTICE_Xyz;
+		if (X&VERTICE_xyZ || y&VERTICE_XYZ || Z&VERTICE_Xyz) n|=VERTICE_XyZ;
+		if (X&VERTICE_xYz || Y&VERTICE_Xyz || z&VERTICE_XYZ) n|=VERTICE_XYz;
+		if (X&VERTICE_xYZ || Y&VERTICE_XyZ || Z&VERTICE_XYz) n|=VERTICE_XYZ;
+		cout<<"n="<<n<<endl;
+		filled[xx][yy][zz]=n;
 	}
 }
 void Grid::block_active(int x, int y, int z, int r, int g, int b)
 {
 	if (isPositionValid(x,y,z))
 	{
-		filled[x][y][z]=true;
-		active[x][y][z]=true;
-		active[x-1][y][z]=true;
-		active[x][y-1][z]=true;
-		active[x][y][z-1]=true;
-		active[x-1][y-1][z]=true;
-		active[x][y-1][z-1]=true;
-		active[x-1][y][z-1]=true;
-		active[x-1][y-1][z-1]=true;
+		filled[x][y][z]=255;
 	}
 }
 void Grid::block_delete(int x, int y, int z)
 {
 	if (isPositionValid(x,y,z))
 	{
-		active[x][y][z]=false;
-		active[x-1][y][z]=false;
-		active[x][y-1][z]=false;
-		active[x][y][z-1]=false;
-		active[x-1][y-1][z]=false;
-		active[x][y-1][z-1]=false;
-		active[x-1][y][z-1]=false;
-		active[x-1][y-1][z-1]=false;
+		filled[x][y][z]=255;
 	}
 }
 
@@ -213,7 +161,7 @@ void Grid::draw()
 {
 	static float angle=0;
 
-	angle+=0.6;
+	angle+=0.6+angle*0.001;
 	glLoadIdentity();
 	glRotatef(angle,1,0.1,0);
 	glRotatef(angle,0.1,1.0,0);
@@ -234,7 +182,7 @@ void Grid::generate_display_list()
 	display_list=glGenLists(1);
 	glLoadIdentity();
 	glNewList(display_list,GL_COMPILE);
-	glScalef(0.05,0.05,0.05);
+	glScalef(0.15,0.15,0.15);
 	glPushMatrix();
 		for(x=1;x<=dimx;++x)
 		{
@@ -259,23 +207,79 @@ void Grid::generate_display_list()
 	
 }
 
+float Color[9]=
+{
+	1.0,0.0,0.0,
+	1.0,0.0,1.0,
+	1.0,0.0,0.1,
+};
+
+
+inline void triangle_get_normal(float t[9],float* x,float* y,float* z)
+{
+	/*
+	 *   v1    v2
+	 *   (0-3) (0-6)
+	 *   (1-4) (1-7)
+	 *   (2-5) (2-8)
+	 */
+	*x=(t[1]-t[4])*(t[2]-t[8]) - (t[1]-t[7])*(t[2]-t[5]);
+	*y=(t[2]-t[5])*(t[0]-t[6]) - (t[2]-t[8])*(t[0]-t[3]);
+	*z=(t[0]-t[3])*(t[1]-t[7]) - (t[0]-t[6])*(t[1]-t[4]);
+
+}
+
 void Grid::generate_display_list(int x,int y, int z)
 {
 	int i,j,k;
 	if (filled[x][y][z])
 	{
-		glColor3f(1.0, 1.0, 1.0);
-		i=getNActive(x,y,z);
+		if (filled[x-1][y][z]==255 &&
+			filled[x+1][y][z]==255 &&
+			filled[x][y-1][z]==255 &&
+			filled[x][y+1][z]==255 &&
+			filled[x][y][z-1]==255 &&
+			filled[x][y][z+1]==255)
+		return;
+
+		static int c=0;
+		i=filled[x][y][z];
 		for(j=0;j<semi_block_n_face[i];++j)
 		{
 			glBegin(GL_TRIANGLES);
+			c=(c+3)%7;
+			glColor3f(Color[c],Color[c+1],Color[c+2]);
+			float triangle[9];
 			for(k=0;k<3;k++)
 			{
 				int face=semi_block_face[i][3*j+k];
+				triangle[3*k+0]=semi_block_vertice[i][3*face+0];
+				triangle[3*k+1]=semi_block_vertice[i][3*face+1];
+				triangle[3*k+2]=semi_block_vertice[i][3*face+2];
+
+			}
+			// normal computation
+			{
+				float nx,ny,nz;
+				triangle_get_normal(triangle,&nx,&ny,&nz);
+				glNormal3f(nx,ny,nz);
+			}
+			// triangle draw
+			{
 				glVertex3f(
-						semi_block_vertice[i][3*face],
-						semi_block_vertice[i][3*face+1],
-						semi_block_vertice[i][3*face+2]
+						triangle[0],
+						triangle[1],
+						triangle[2]
+				);
+				glVertex3f(
+						triangle[3],
+						triangle[4],
+						triangle[5]
+				);
+				glVertex3f(
+						triangle[6],
+						triangle[7],
+						triangle[8]
 				);
 			}
 			glEnd();

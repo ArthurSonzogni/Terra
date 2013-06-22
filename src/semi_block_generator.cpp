@@ -84,7 +84,7 @@ semi_block_generator_filler::~semi_block_generator_filler()
 {
 	for(int i=0;i<256;++i)
 	{
-		delete[] semi_block_vertice[3*i];
+		delete[] semi_block_vertice[i];
 		delete[] semi_block_face[i];
 	}
 }
