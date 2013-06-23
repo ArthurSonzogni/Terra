@@ -122,6 +122,7 @@ void Grid::block_semi_active(int xx, int yy, int zz, int r, int g, int b)
 {
 	if (isPositionValid(xx,yy,zz))
 	{
+		color[xx][yy][zz]=color_manager.getColor(r,g,b);
 		filled[xx][yy][zz]=0;
 		int z=filled[xx][yy][zz-1];
 		int Z=filled[xx][yy][zz+1];
@@ -145,6 +146,7 @@ void Grid::block_active(int x, int y, int z, int r, int g, int b)
 {
 	if (isPositionValid(x,y,z))
 	{
+		color[x][y][z]=color_manager.getColor(r,g,b);
 		filled[x][y][z]=255;
 	}
 }
@@ -162,12 +164,23 @@ void Grid::draw()
 
 	angle+=0.6+angle*0.001;
 	glLoadIdentity();
-	glRotatef(angle,1,0.1,0);
-	glRotatef(angle,0.1,1.0,0);
+	for(int i=0;i<26;++i)
+	{
+
+		glPushMatrix();
+		glRotatef(15*i,0,0,1);
+	glTranslatef(0.f,-0.5f,0.f);
+	glRotatef(angle,0,1,0);
+	glRotatef(10*angle,1,0,0);
+
+	//glRotatef(angle,0.1,1.0,0);
 	if (display_list==0)
 		generate_display_list();
+	
+		glCallList(display_list);
+		glPopMatrix();
+	}
 
-	glCallList(display_list);
 }
 
 
@@ -227,6 +240,7 @@ inline void triangle_get_normal(float t[9],float* x,float* y,float* z)
 
 }
 
+
 void Grid::generate_display_list(int x,int y, int z)
 {
 	int i,j,k;
@@ -239,9 +253,20 @@ void Grid::generate_display_list(int x,int y, int z)
 			filled[x][y][z-1]==255 &&
 			filled[x][y][z+1]==255)
 		return;
-
 		static int c=0;
 		i=filled[x][y][z];
+
+		// change color model of the block
+		float MatDif[4] = {0.5f, 0.5f, 0.5f, 1.0f};
+		float MatAmb[4] = {0.3f, 0.3f, 0.3f, 1.0f};
+		float MatSpec[4]= {0.2f,0.2f,0.2f,1.0f};
+		float MatShininess[]={1.f};
+
+		glMaterialfv(GL_FRONT,GL_SPECULAR,MatSpec);
+		glMaterialfv(GL_FRONT,GL_DIFFUSE,color[x][y][z]);
+		glMaterialfv(GL_FRONT,GL_AMBIENT,MatAmb);
+		glMaterialfv(GL_FRONT,GL_SHININESS,MatShininess);
+
 		for(j=0;j<semi_block_n_face[i];++j)
 		{
 			// if this triangle touch another triangle of the opposite
@@ -258,6 +283,8 @@ void Grid::generate_display_list(int x,int y, int z)
 			glBegin(GL_TRIANGLES);
 			c=(c+3)%7;
 			glColor3f(Color[c],Color[c+1],Color[c+2]);
+				
+			
 			float triangle[9];
 			for(k=0;k<3;k++)
 			{

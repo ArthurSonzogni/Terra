@@ -10,57 +10,53 @@ int main()
 	Grid g;
 	g.set_dimension(10,10,10);
 	
-	g.block_active(1,2,1,255,255,255);
-	g.block_active(2,1,1,255,255,255);
+	g.block_active(1,1,1,255,255,255);
+	g.block_active(2,1,1,255,0,0);
+	g.block_active(3,1,1,0,0,255);
+	g.block_active(4,1,1,0,255,0);
+	g.block_active(5,1,1,255,255,0);
+	g.block_active(6,1,1,255,0,255);
+	g.block_active(7,1,1,0,255,255);
+	g.block_active(8,1,1,0,0,0);
+
 	g.block_active(1,2,1,255,255,255);
 	g.block_active(1,1,2,255,255,255);
-	g.block_active(3,1,2,255,255,255);
-	g.block_active(4,1,2,255,255,255);
-	g.block_active(5,1,2,255,255,255);
-	g.block_active(6,1,2,255,255,255);
-	g.block_active(7,1,2,255,255,255);
-
-	g.block_semi_active(1,1,1,255,255,255);
+	g.block_active(1,2,2,255,255,255);
 	g.block_semi_active(2,2,1,255,255,255);
-	g.block_semi_active(1,2,2,255,255,255);
-	g.block_semi_active(2,1,2,255,255,255);
 	g.block_semi_active(2,2,2,255,255,255);
-	
-	//g.block_semi_active(,255,255,255);
-    // chargement des ressources, initialisation des états OpenGL, ...
-	
+	g.block_semi_active(1,2,1,255,255,255);
+
+
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CW);
 	
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHT1);
+
 	glEnable(GL_NORMALIZE);
+	glMatrixMode(GL_MODELVIEW);
 	glShadeModel(GL_SMOOTH);
 
 
-    //Add ambient light
-	GLfloat ambientColor[] = {0.3f, 0.3f, 0.3f, 1.0f};
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
+	 
+	float Light1Pos[4] = {0.0f, 1.f, -3.f, 1.0f};
+	float Light1Dif[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+	float Light1Spec[4] = {1.0f, 1.f, 1.f, 1.0f};
+	float Light1Amb[4] = {0.1f, 0.1f, 0.1f, 1.0f};
 
-	//Add positioned light
-	GLfloat lightPos0[] = {0.f,10.f,0.0f, 1.0f};
-	GLfloat lightColor0[] = {1.0f, 0.5f, 0.5f, 1.0f};
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
-
-	//Add directed light
-	GLfloat lightColor1[] = {0.5f, 0.5f, 0.5f, 1.6f}; //Color (0.5, 0.2, 0.2)
-
-	//Coming from the direction (-1, 0.5, 0.5)
-	GLfloat lightPos1[] = {-1.0f, 0.5f, 0.5f, 0.0f};
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightColor1);
-	glLightfv(GL_LIGHT1, GL_POSITION, lightPos1);
-	
+	GLfloat  matShininess[]={50.0};
+	 
+	 
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, Light1Dif); 	//Et ceux de la lumière
+	glLightfv(GL_LIGHT0, GL_SPECULAR, Light1Spec);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, Light1Amb);
 
 
-	glEnable(GL_NORMALIZE);
+	glLightfv(GL_LIGHT0, GL_POSITION, Light1Pos);
+	float Light1Dir[3] = {0.0f, -1.0f, 1.0f};
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Light1Dir);
 
     // la boucle principale
     bool running = true;
