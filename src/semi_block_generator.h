@@ -1,7 +1,12 @@
 extern float* semi_block_vertice[256];
 extern int semi_block_n_vertice[256];
 extern int* semi_block_face[256];
+extern int* semi_block_face_id[256];
 extern int semi_block_n_face[256];
+extern int semi_block_face_id_get_opposite_id[256];
+extern int semi_block_face_id_get_opposite_rel_x[256];
+extern int semi_block_face_id_get_opposite_rel_y[256];
+extern int semi_block_face_id_get_opposite_rel_z[256];
 
 
 #define VERTICE_xyz	1

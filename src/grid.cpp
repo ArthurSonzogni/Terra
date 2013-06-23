@@ -138,7 +138,6 @@ void Grid::block_semi_active(int xx, int yy, int zz, int r, int g, int b)
 		if (X&VERTICE_xyZ || y&VERTICE_XYZ || Z&VERTICE_Xyz) n|=VERTICE_XyZ;
 		if (X&VERTICE_xYz || Y&VERTICE_Xyz || z&VERTICE_XYZ) n|=VERTICE_XYz;
 		if (X&VERTICE_xYZ || Y&VERTICE_XyZ || Z&VERTICE_XYz) n|=VERTICE_XYZ;
-		cout<<"n="<<n<<endl;
 		filled[xx][yy][zz]=n;
 	}
 }
@@ -178,7 +177,6 @@ void Grid::generate_display_list()
 	if (display_list!=0)
 		glDeleteLists(display_list,1);
 	
-	cout<<"regenerate"<<endl;
 	display_list=glGenLists(1);
 	glLoadIdentity();
 	glNewList(display_list,GL_COMPILE);
@@ -246,16 +244,27 @@ void Grid::generate_display_list(int x,int y, int z)
 		i=filled[x][y][z];
 		for(j=0;j<semi_block_n_face[i];++j)
 		{
+			// if this triangle touch another triangle of the opposite
+			// semi_block, we abort its display.
+			int face_id=semi_block_face_id[i][j];
+			int op_id=semi_block_face_id_get_opposite_id[face_id];	
+			int rel_x=semi_block_face_id_get_opposite_rel_x[face_id];	
+			int rel_y=semi_block_face_id_get_opposite_rel_y[face_id];	
+			int rel_z=semi_block_face_id_get_opposite_rel_z[face_id];	
+			if (op_id!=0 and 
+				((filled[x+rel_x][y+rel_y][z+rel_z] & op_id) == op_id))
+				continue;
+
 			glBegin(GL_TRIANGLES);
 			c=(c+3)%7;
 			glColor3f(Color[c],Color[c+1],Color[c+2]);
 			float triangle[9];
 			for(k=0;k<3;k++)
 			{
-				int face=semi_block_face[i][3*j+k];
-				triangle[3*k+0]=semi_block_vertice[i][3*face+0];
-				triangle[3*k+1]=semi_block_vertice[i][3*face+1];
-				triangle[3*k+2]=semi_block_vertice[i][3*face+2];
+				int vertice=semi_block_face[i][3*j+k];
+				triangle[3*k+0]=semi_block_vertice[i][3*vertice+0];
+				triangle[3*k+1]=semi_block_vertice[i][3*vertice+1];
+				triangle[3*k+2]=semi_block_vertice[i][3*vertice+2];
 
 			}
 			// normal computation

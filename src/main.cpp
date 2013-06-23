@@ -10,20 +10,27 @@ int main()
 	Grid g;
 	g.set_dimension(10,10,10);
 	
+	g.block_active(1,2,1,255,255,255);
 	g.block_active(2,1,1,255,255,255);
 	g.block_active(1,2,1,255,255,255);
 	g.block_active(1,1,2,255,255,255);
+	g.block_active(3,1,2,255,255,255);
+	g.block_active(4,1,2,255,255,255);
+	g.block_active(5,1,2,255,255,255);
+	g.block_active(6,1,2,255,255,255);
+	g.block_active(7,1,2,255,255,255);
 
 	g.block_semi_active(1,1,1,255,255,255);
 	g.block_semi_active(2,2,1,255,255,255);
 	g.block_semi_active(1,2,2,255,255,255);
 	g.block_semi_active(2,1,2,255,255,255);
 	g.block_semi_active(2,2,2,255,255,255);
+	
 	//g.block_semi_active(,255,255,255);
     // chargement des ressources, initialisation des états OpenGL, ...
+	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glEnable(GL_LIGHTING);
 	glFrontFace(GL_CW);
 	
 	glEnable(GL_LIGHTING);
