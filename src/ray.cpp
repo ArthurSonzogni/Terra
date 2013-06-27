@@ -8,7 +8,7 @@ inline float max(float x,float y)
 
 inline float min(float x,float y)
 {
-	return (x>y)?x:y;
+	return (x<y)?x:y;
 }
 
 Ray::Ray():
@@ -51,10 +51,10 @@ void Ray::increment()
 	
 	if (dx!=0.0) tx=(0.0-x_rel)/dx;
 	if (dx!=0.0) tX=(1.0-x_rel)/dx;
-	if (dy!=0.0) ty=(0.0-y_rel)/dx;
-	if (dy!=0.0) tY=(1.0-y_rel)/dx;
-	if (dz!=0.0) tz=(0.0-z_rel)/dx;
-	if (dz!=0.0) tZ=(1.0-z_rel)/dx;
+	if (dy!=0.0) ty=(0.0-y_rel)/dy;
+	if (dy!=0.0) tY=(1.0-y_rel)/dy;
+	if (dz!=0.0) tz=(0.0-z_rel)/dz;
+	if (dz!=0.0) tZ=(1.0-z_rel)/dz;
 	
 	float t=0.0;
 	t=max(t,tx);

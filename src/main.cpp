@@ -1,6 +1,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/OpenGL.hpp>
 #include "grid.h"
+#include "ray.h" // need remove
 
 int andom=3;
 int Random()
@@ -18,6 +19,19 @@ bool z_ok(int x,int y,int z)
 
 int main()
 {
+	// test
+	Ray r;
+	r.set_position(0.5,2.5,3.5);
+	r.set_direction(1,10,1);
+	for(int i=0;i<20;++i)
+	{
+		int x,y,z;
+		r.increment();
+		r.get_current_position(&x,&y,&z);
+		cout<<x<<" "<<y<<" "<<z<<endl;
+	}
+
+
     // crée la fenêtre
     sf::Window window(sf::VideoMode(800, 600), "OpenGL", sf::Style::Default, sf::ContextSettings(32));
     window.setVerticalSyncEnabled(true);
