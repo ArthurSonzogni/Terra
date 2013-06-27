@@ -12,4 +12,4 @@ add_executable(terra ${source_file})
 
 # link configuration
 target_link_libraries(terra sfml-audio sfml-graphics sfml-window sfml-system GL
-	glut)
+	GLU glut)

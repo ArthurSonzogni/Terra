@@ -1,3 +1,6 @@
+#ifndef COLOR_MANAGER_EUY9ZRUP
+#define COLOR_MANAGER_EUY9ZRUP
+
 #include "color_manager.h"
 
 float* Color_manager::getColor(int red, int green, int blue)
@@ -28,3 +31,5 @@ Color_manager::~Color_manager()
 		delete[] it->second;
 	}
 }
+
+#endif /* end of include guard: COLOR_MANAGER_EUY9ZRUP */

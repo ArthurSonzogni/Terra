@@ -1,7 +1,9 @@
 #include <SFML/Window.hpp>
 #include <SFML/OpenGL.hpp>
 #include "grid.h"
-#include "ray.h" // need remove
+#include "character_free_view.h"
+#include <GL/glu.h>
+using namespace sf;
 
 int andom=3;
 int Random()
@@ -19,22 +21,10 @@ bool z_ok(int x,int y,int z)
 
 int main()
 {
-	// test
-	Ray r;
-	r.set_position(0.5,2.5,3.5);
-	r.set_direction(1,10,1);
-	for(int i=0;i<20;++i)
-	{
-		int x,y,z;
-		r.increment();
-		r.get_current_position(&x,&y,&z);
-		cout<<x<<" "<<y<<" "<<z<<endl;
-	}
-
-
     // crée la fenêtre
     sf::Window window(sf::VideoMode(800, 600), "OpenGL", sf::Style::Default, sf::ContextSettings(32));
     window.setVerticalSyncEnabled(true);
+
 	Grid g;
 	g.set_dimension(10,10,10);
 	
@@ -73,10 +63,14 @@ int main()
 	glEnable(GL_LIGHT0);
 
 	glEnable(GL_NORMALIZE);
-	glMatrixMode(GL_MODELVIEW);
 	glShadeModel(GL_SMOOTH);
 
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(90.f, 1.f, 1.f, 500.f);
+	//glOrtho(-1,1,-1,1,-100,100);
 
+	glMatrixMode(GL_MODELVIEW);
 	 
 	float Light1Pos[4] = {0.0f, 1.f, -3.f, 1.0f};
 	float Light1Dif[4] = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -94,6 +88,11 @@ int main()
 	glLightfv(GL_LIGHT0, GL_POSITION, Light1Pos);
 	float Light1Dir[3] = {0.0f, -1.0f, 1.0f};
 	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Light1Dir);
+
+	// Character creation
+	Character_free_view character;
+	character.set_grid(&g);
+	//character.camera.z=0;
 
     // la boucle principale
     bool running = true;
@@ -118,6 +117,15 @@ int main()
         // effacement les tampons de couleur/profondeur
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		if (Keyboard::isKeyPressed(sf::Keyboard::Left))
+			character.move_left();
+
+		if (Keyboard::isKeyPressed(sf::Keyboard::Right))
+			character.move_right();
+
+		if (Keyboard::isKeyPressed(sf::Keyboard::Up))
+			character.move_forward();
+		character.get_view();
 		g.draw();
 
         // termine la trame courante (en interne, échange les deux tampons de rendu)

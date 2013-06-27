@@ -1,3 +1,6 @@
+#ifndef SEMI_BLOCK_GENERATOR_E05ZI460
+#define SEMI_BLOCK_GENERATOR_E05ZI460
+
 extern float* semi_block_vertice[256];
 extern int semi_block_n_vertice[256];
 extern int* semi_block_face[256];
@@ -18,3 +21,6 @@ extern bool semi_block_valid[256];
 #define VERTICE_XyZ	32
 #define VERTICE_XYz	64
 #define VERTICE_XYZ	128
+
+
+#endif /* end of include guard: SEMI_BLOCK_GENERATOR_E05ZI460 */

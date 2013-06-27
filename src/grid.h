@@ -1,3 +1,6 @@
+#ifndef GRID_V9ZCSRYS
+#define GRID_V9ZCSRYS
+
 #include <iostream>
 #include <SFML/OpenGL.hpp>
 #include "color_manager.h"
@@ -48,3 +51,7 @@ class Grid
 		
 		~Grid();
 };
+
+
+#endif /* end of include guard: GRID_V9ZCSRYS */
+

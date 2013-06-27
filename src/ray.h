@@ -1,3 +1,6 @@
+#ifndef RAY_U3XLX2Q7
+#define RAY_U3XLX2Q7
+
 class Ray
 {
 	public:
@@ -12,3 +15,6 @@ class Ray
 		void increment();
 		void get_current_position(int* X,int* Y,int *Z);
 };
+
+#endif /* end of include guard: RAY_U3XLX2Q7 */
+

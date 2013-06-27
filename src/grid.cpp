@@ -162,21 +162,13 @@ void Grid::block_delete(int x, int y, int z)
 void Grid::draw()
 {
 	if (display_list==0)
+	{
+		glPushMatrix();
 		generate_display_list();
+		glPopMatrix();
+	}
 
-	static float angle=10;
-
-	angle+=0.5+angle*0.001;
-	glLoadIdentity();
-
-	glRotatef(angle,1,0,0);
-	glRotatef(angle*0.1,0,1,0);
-	glRotatef(angle*0.01,0,0,1);
 	glCallList(display_list);
-
-	
-	
-
 }
 
 
@@ -199,7 +191,6 @@ void Grid::generate_display_list()
 				glPushMatrix();
 				for(z=1;z<=dimz;++z)
 				{
-					glTranslatef(0.01f,0.f,0.f);
 					generate_display_list(x,y,z);
 					glTranslatef(0.f,0.f,1.f);
 				}
