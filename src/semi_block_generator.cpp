@@ -12,6 +12,7 @@ int semi_block_face_id_get_opposite_id[256];
 int semi_block_face_id_get_opposite_rel_x[256];
 int semi_block_face_id_get_opposite_rel_y[256];
 int semi_block_face_id_get_opposite_rel_z[256];
+bool semi_block_valid[256];
 
 class semi_block_generator_filler
 {
@@ -168,6 +169,25 @@ semi_block_generator_filler::semi_block_generator_filler()
 	t[0b10001010]=0b01000101; zz[0b10001010]=1;
 	t[0b00101010]=0b00010101; zz[0b00101010]=1;
 
+	/**********************************
+	 * 	semi_block_valid_generation
+	 **********************************/
+	for(int i=0;i<256;++i)
+	{
+		semi_block_valid[i]=
+			// xface
+			(i&0b00001111) &&
+			// Xface
+			(i&0b11110000) &&
+			// yface
+			(i&0b00110011) &&
+			// Yface
+			(i&0b11001100) &&
+			// zface
+			(i&0b01010101) &&
+			// Zface
+			(i&0b10101010);
+	}
 }
 
 // I define a class that is instanciate juste after its declaration

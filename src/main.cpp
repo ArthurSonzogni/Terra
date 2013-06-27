@@ -2,6 +2,20 @@
 #include <SFML/OpenGL.hpp>
 #include "grid.h"
 
+int andom=3;
+int Random()
+{
+	andom+=7;
+	andom*=13;
+	andom+=andom%10;
+	return  255+0*andom%155;
+}
+
+bool z_ok(int x,int y,int z)
+{
+	return z<3+((x%2+x%5)%2 + (y%2+y%3)%2)%2;
+}
+
 int main()
 {
     // crée la fenêtre
@@ -10,22 +24,31 @@ int main()
 	Grid g;
 	g.set_dimension(10,10,10);
 	
-	g.block_active(1,1,1,255,255,255);
-	g.block_active(2,1,1,255,0,0);
-	g.block_active(3,1,1,0,0,255);
-	g.block_active(4,1,1,0,255,0);
-	g.block_active(5,1,1,255,255,0);
-	g.block_active(6,1,1,255,0,255);
-	g.block_active(7,1,1,0,255,255);
-	g.block_active(8,1,1,0,0,0);
 
-	g.block_active(1,2,1,255,255,255);
-	g.block_active(1,1,2,255,255,255);
-	g.block_active(1,2,2,255,255,255);
-	g.block_semi_active(2,2,1,255,255,255);
-	g.block_semi_active(2,2,2,255,255,255);
-	g.block_semi_active(1,2,1,255,255,255);
+	for(int x=0;x<10;++x)
+	for(int y=0;y<10;++y)
+	for(int z=0;z<10;++z)
+	{
+		if (z_ok(x,y,z))
+			g.block_active(x,y,z,
+					z*50+Random()-200,
+					Random(),
+					Random()
+					);
+	}
 
+	for(int k=0;k<10;++k)
+	for(int x=0;x<10;++x)
+	for(int y=0;y<10;++y)
+	for(int z=0;z<10;++z)
+	{
+		if (z_ok(x,y,z-1) and !z_ok(x,y,z))
+			g.block_semi_active(x,y,z,
+					z*50+Random()-200,
+					Random(),
+					Random()
+					);
+	}
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);

@@ -7,6 +7,7 @@ extern int semi_block_face_id_get_opposite_id[256];
 extern int semi_block_face_id_get_opposite_rel_x[256];
 extern int semi_block_face_id_get_opposite_rel_y[256];
 extern int semi_block_face_id_get_opposite_rel_z[256];
+extern bool semi_block_valid[256];
 
 
 #define VERTICE_xyz	1

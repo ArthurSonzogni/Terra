@@ -139,7 +139,8 @@ void Grid::block_semi_active(int xx, int yy, int zz, int r, int g, int b)
 		if (X&VERTICE_xyZ || y&VERTICE_XYZ || Z&VERTICE_Xyz) n|=VERTICE_XyZ;
 		if (X&VERTICE_xYz || Y&VERTICE_Xyz || z&VERTICE_XYZ) n|=VERTICE_XYz;
 		if (X&VERTICE_xYZ || Y&VERTICE_XyZ || Z&VERTICE_XYz) n|=VERTICE_XYZ;
-		filled[xx][yy][zz]=n;
+		if (semi_block_valid[n])
+			filled[xx][yy][zz]=n;
 	}
 }
 void Grid::block_active(int x, int y, int z, int r, int g, int b)
@@ -160,26 +161,21 @@ void Grid::block_delete(int x, int y, int z)
 
 void Grid::draw()
 {
-	static float angle=0;
-
-	angle+=0.6+angle*0.001;
-	glLoadIdentity();
-	for(int i=0;i<26;++i)
-	{
-
-		glPushMatrix();
-		glRotatef(15*i,0,0,1);
-	glTranslatef(0.f,-0.5f,0.f);
-	glRotatef(angle,0,1,0);
-	glRotatef(10*angle,1,0,0);
-
-	//glRotatef(angle,0.1,1.0,0);
 	if (display_list==0)
 		generate_display_list();
+
+	static float angle=10;
+
+	angle+=0.5+angle*0.001;
+	glLoadIdentity();
+
+	glRotatef(angle,1,0,0);
+	glRotatef(angle*0.1,0,1,0);
+	glRotatef(angle*0.01,0,0,1);
+	glCallList(display_list);
+
 	
-		glCallList(display_list);
-		glPopMatrix();
-	}
+	
 
 }
 
@@ -193,7 +189,7 @@ void Grid::generate_display_list()
 	display_list=glGenLists(1);
 	glLoadIdentity();
 	glNewList(display_list,GL_COMPILE);
-	glScalef(0.15,0.15,0.15);
+	glScalef(0.05,0.05,0.05);
 	glPushMatrix();
 		for(x=1;x<=dimx;++x)
 		{

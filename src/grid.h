@@ -14,8 +14,12 @@ class Grid
 		
 		bool is_initiate;
 		 
+		// grid information
 		int ***filled;
-		float ****color; 	
+		float ****color; 
+		float ***light_level;
+		float ***light_emission;
+		
 		
 		Color_manager color_manager;
 
