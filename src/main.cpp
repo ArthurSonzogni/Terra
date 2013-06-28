@@ -26,35 +26,35 @@ int main()
     window.setVerticalSyncEnabled(true);
 
 	Grid g;
-	g.set_dimension(10,10,10);
+	g.set_dimension(25,25,25);
 	
 
-	for(int x=0;x<10;++x)
-	for(int y=0;y<10;++y)
-	for(int z=0;z<10;++z)
+	for(int x=0;x<25;++x)
+	for(int y=0;y<25;++y)
+	for(int z=0;z<25;++z)
 	{
 		if (z_ok(x,y,z))
 			g.block_active(x,y,z,
-					z*50+Random()-200,
+					Random()/(z+1),
 					Random(),
 					Random()
 					);
 	}
 
-	for(int k=0;k<10;++k)
-	for(int x=0;x<10;++x)
-	for(int y=0;y<10;++y)
-	for(int z=0;z<10;++z)
+	for(int k=0;k<2;++k)
+	for(int x=0;x<25;++x)
+	for(int y=0;y<25;++y)
+	for(int z=0;z<25;++z)
 	{
 			g.block_semi_active(x,y,z,
-					z*50+Random()-200,
+					Random()/(z+1),
 					Random(),
 					Random()
 					);
 	}
 
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
+	glDisable(GL_BLEND);
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	
@@ -71,7 +71,7 @@ int main()
 
 	glMatrixMode(GL_MODELVIEW);
 	 
-	float Light1Pos[4] = {0.5f, 0.5f, 5.5, 1.0f};
+	float Light1Pos[4] = {-1.5f, -1.5f, 5.5, 1.0f};
 	float Light1Dif[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 	float Light1Spec[4] = {1.0f, 1.f, 1.f, 1.0f};
 	float Light1Amb[4] = {0.1f, 0.1f, 0.1f, 1.0f};

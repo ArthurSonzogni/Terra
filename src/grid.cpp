@@ -131,16 +131,16 @@ void Grid::block_semi_active(int xx, int yy, int zz, int r, int g, int b)
 		int x=filled[xx-1][yy][zz];
 		int X=filled[xx+1][yy][zz];
 		int n=0;
-		if (x&VERTICE_Xyz || y&VERTICE_xYz || z&VERTICE_xyZ) n|=VERTICE_xyz;
-		if (x&VERTICE_XyZ || y&VERTICE_xYZ || Z&VERTICE_xyz) n|=VERTICE_xyZ;
-		if (x&VERTICE_XYz || Y&VERTICE_xyz || z&VERTICE_xYZ) n|=VERTICE_xYz;
-		if (x&VERTICE_XYZ || Y&VERTICE_xyZ || Z&VERTICE_xYz) n|=VERTICE_xYZ;
-		if (X&VERTICE_xyz || y&VERTICE_XYz || z&VERTICE_XyZ) n|=VERTICE_Xyz;
-		if (X&VERTICE_xyZ || y&VERTICE_XYZ || Z&VERTICE_Xyz) n|=VERTICE_XyZ;
-		if (X&VERTICE_xYz || Y&VERTICE_Xyz || z&VERTICE_XYZ) n|=VERTICE_XYz;
-		if (X&VERTICE_xYZ || Y&VERTICE_XyZ || Z&VERTICE_XYz) n|=VERTICE_XYZ;
+		if ((x&VERTICE_Xyz) || (y&VERTICE_xYz) || (z&VERTICE_xyZ)) n|=VERTICE_xyz;
+		if ((x&VERTICE_XyZ) || (y&VERTICE_xYZ) || (Z&VERTICE_xyz)) n|=VERTICE_xyZ;
+		if ((x&VERTICE_XYz) || (Y&VERTICE_xyz) || (z&VERTICE_xYZ)) n|=VERTICE_xYz;
+		if ((x&VERTICE_XYZ) || (Y&VERTICE_xyZ) || (Z&VERTICE_xYz)) n|=VERTICE_xYZ;
+		if ((X&VERTICE_xyz) || (y&VERTICE_XYz) || (z&VERTICE_XyZ)) n|=VERTICE_Xyz;
+		if ((X&VERTICE_xyZ) || (y&VERTICE_XYZ) || (Z&VERTICE_Xyz)) n|=VERTICE_XyZ;
+		if ((X&VERTICE_xYz) || (Y&VERTICE_Xyz) || (z&VERTICE_XYZ)) n|=VERTICE_XYz;
+		if ((X&VERTICE_xYZ) || (Y&VERTICE_XyZ) || (Z&VERTICE_XYz)) n|=VERTICE_XYZ;
 		if (semi_block_valid[n])
-			filled[xx][yy][zz]=n;
+			filled[xx][yy][zz]|=n;
 	}
 }
 void Grid::block_active(int x, int y, int z, int r, int g, int b)
@@ -182,6 +182,7 @@ void Grid::generate_display_list()
 	glLoadIdentity();
 	glNewList(display_list,GL_COMPILE);
 	glPushMatrix();
+	glBegin(GL_TRIANGLES);
 		for(x=1;x<=dimx;++x)
 		{
 			glPushMatrix();
@@ -199,6 +200,7 @@ void Grid::generate_display_list()
 			glPopMatrix();
 			glTranslatef(1.f,0.f,0.f);
 		}
+	glEnd();
 	glPopMatrix();
 	glEndList();;
 	
@@ -266,7 +268,10 @@ void Grid::generate_display_list(int x,int y, int z)
 				((filled[x+rel_x][y+rel_y][z+rel_z] & op_id) == op_id))
 				continue;
 
-			glBegin(GL_TRIANGLES);
+			static int nb=0;
+			nb++;
+			cout<<nb<<endl;
+
 			c=(c+3)%7;
 			glColor3f(Color[c],Color[c+1],Color[c+2]);
 				
@@ -289,22 +294,21 @@ void Grid::generate_display_list(int x,int y, int z)
 			// triangle draw
 			{
 				glVertex3f(
-						triangle[0],
-						triangle[1],
-						triangle[2]
+						triangle[0]+x,
+						triangle[1]+y,
+						triangle[2]+z
 				);
 				glVertex3f(
-						triangle[3],
-						triangle[4],
-						triangle[5]
+						triangle[3]+x,
+						triangle[4]+y,
+						triangle[5]+z
 				);
 				glVertex3f(
-						triangle[6],
-						triangle[7],
-						triangle[8]
+						triangle[6]+x,
+						triangle[7]+y,
+						triangle[8]+z
 				);
 			}
-			glEnd();
 		}
 	}
 }
