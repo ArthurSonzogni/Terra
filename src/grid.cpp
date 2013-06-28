@@ -181,7 +181,6 @@ void Grid::generate_display_list()
 	display_list=glGenLists(1);
 	glLoadIdentity();
 	glNewList(display_list,GL_COMPILE);
-	glScalef(0.05,0.05,0.05);
 	glPushMatrix();
 		for(x=1;x<=dimx;++x)
 		{

@@ -17,12 +17,11 @@ void Character::mouse_click()
 }
 void Character::update_mouse_position(int x, int y)
 {
-
 }
 
 void Character::move_forward()
 {
-	camera.move_forward(0.01);
+	camera.move_forward(0.1);
 }
 
 void Character::move_backward()

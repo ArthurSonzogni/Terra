@@ -12,18 +12,18 @@ Camera::Camera():
 	angle_xz(0)
 {
 }
+
 void Camera::move_forward(float increment)
 {
 	x+=increment*cos(angle_xy)*cos(angle_xz);
 	y+=increment*sin(angle_xy)*cos(angle_xz);
 	z+=increment*sin(angle_xz);
-	cout<<x<<" "<<y<<" "<<z<<" "<<angle_xy<<" "<<angle_xz<<endl;
 }
 
 void Camera::move_laterally(float increment)
 {
 	x+=increment*sin(angle_xy)*cos(angle_xz);
-	y+=increment*cos(angle_xy)*cos(angle_xz);
+	y+=-increment*cos(angle_xy)*cos(angle_xz);
 	z+=increment*sin(angle_xz);
 }
 void Camera::angle_xy_change(float increment)
@@ -37,10 +37,10 @@ void Camera::angle_xz_change(float increment)
 
 void Camera::get_view()
 {
+	cout<<x<<" "<<y<<" "<<z<<" "<<angle_xy<<" "<<angle_xz<<endl;
 	glLoadIdentity();
-	static float xxx=0;;
-	gluLookAt(1.0+xxx,xxx*xxx,0,0,0,0,0,0,1); 
-	glTranslatef(x,y,z);
-	glRotatef(angle_xy*RADTODEG,0.f,1.f,0.f);
-	glRotatef(angle_xz*RADTODEG,0.f,0.f,1.f);
+	gluLookAt(0,0,0,1,0,0,0,0,1);
+	glRotatef(angle_xz*RADTODEG,0.f,1.f,0.f);
+	glRotatef(-angle_xy*RADTODEG,0.f,0.f,1.f);
+	glTranslatef(-x,-y,-z);
 }

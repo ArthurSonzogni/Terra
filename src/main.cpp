@@ -16,7 +16,7 @@ int Random()
 
 bool z_ok(int x,int y,int z)
 {
-	return z<3+((x%2+x%5)%2 + (y%2+y%3)%2)%2;
+	return z<3+((x%2+x%5)%2 + (y%2+y%3)%2)%2+y;
 }
 
 int main()
@@ -46,7 +46,6 @@ int main()
 	for(int y=0;y<10;++y)
 	for(int z=0;z<10;++z)
 	{
-		if (z_ok(x,y,z-1) and !z_ok(x,y,z))
 			g.block_semi_active(x,y,z,
 					z*50+Random()-200,
 					Random(),
@@ -57,7 +56,7 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CW);
+	glFrontFace(GL_CCW);
 	
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -72,7 +71,7 @@ int main()
 
 	glMatrixMode(GL_MODELVIEW);
 	 
-	float Light1Pos[4] = {0.0f, 1.f, -3.f, 1.0f};
+	float Light1Pos[4] = {0.5f, 0.5f, 5.5, 1.0f};
 	float Light1Dif[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 	float Light1Spec[4] = {1.0f, 1.f, 1.f, 1.0f};
 	float Light1Amb[4] = {0.1f, 0.1f, 0.1f, 1.0f};
@@ -85,13 +84,16 @@ int main()
 	glLightfv(GL_LIGHT0, GL_AMBIENT, Light1Amb);
 
 
-	glLightfv(GL_LIGHT0, GL_POSITION, Light1Pos);
-	float Light1Dir[3] = {0.0f, -1.0f, 1.0f};
+	float Light1Dir[3] = {0.0f, 0.0f, -1.0f};
 	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Light1Dir);
 
 	// Character creation
 	Character_free_view character;
 	character.set_grid(&g);
+	Vector2i position;
+	position.x=400;
+	position.y=300;
+	Mouse::setPosition(position,window);
 	//character.camera.z=0;
 
     // la boucle principale
@@ -112,6 +114,13 @@ int main()
                 // on ajuste le viewport lorsque la fenêtre est redimensionnée
                 glViewport(0, 0, event.size.width, event.size.height);
             }
+			else if (event.type == sf::Event::KeyPressed)
+			{
+				if (event.key.code == sf::Keyboard::Escape)
+				{
+					running=false;
+				}
+			}
         }
 
         // effacement les tampons de couleur/profondeur
@@ -125,7 +134,18 @@ int main()
 
 		if (Keyboard::isKeyPressed(sf::Keyboard::Up))
 			character.move_forward();
+
+		if (Keyboard::isKeyPressed(sf::Keyboard::Down))
+			character.move_backward();
+
+
+		Vector2i position = sf::Mouse::getPosition(window);
+		character.update_mouse_position(position.x-400,-(position.y-300));
+		position.x=400;
+		position.y=300;
+		Mouse::setPosition(position,window);
 		character.get_view();
+		glLightfv(GL_LIGHT0, GL_POSITION, Light1Pos);
 		g.draw();
 
         // termine la trame courante (en interne, échange les deux tampons de rendu)
