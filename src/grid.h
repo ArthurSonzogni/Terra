@@ -49,6 +49,8 @@ class Grid
 		void block_delete(int x, int y, int z);
 		void draw();
 		
+		int get_filled(int x, int y, int z);
+		
 		~Grid();
 };
 

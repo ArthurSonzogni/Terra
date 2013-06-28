@@ -13,6 +13,7 @@ class Ray
 		void set_position(float X,float Y,float Z);
 		void set_direction(float DX, float DY, float DZ);
 		void increment();
+		void decrement();
 		void get_current_position(int* X,int* Y,int *Z);
 };
 

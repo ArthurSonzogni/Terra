@@ -8,6 +8,7 @@ class Character_free_view : public Character
 {	
 	public:
 		virtual void update_mouse_position(int x, int y);
+		virtual void mouse_click();
 };
 
 

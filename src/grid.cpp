@@ -130,6 +130,16 @@ void Grid::block_semi_active(int xx, int yy, int zz, int r, int g, int b)
 		int Y=filled[xx][yy+1][zz];
 		int x=filled[xx-1][yy][zz];
 		int X=filled[xx+1][yy][zz];
+
+		int xyz=filled[xx-1][yy-1][zz-1];
+		int xyZ=filled[xx-1][yy-1][zz+1];
+		int xYz=filled[xx-1][yy+1][zz-1];
+		int xYZ=filled[xx-1][yy+1][zz+1];
+		int Xyz=filled[xx+1][yy-1][zz-1];
+		int XyZ=filled[xx+1][yy-1][zz+1];
+		int XYz=filled[xx+1][yy+1][zz-1];
+		int XYZ=filled[xx+1][yy+1][zz+1];
+
 		int n=0;
 		if ((x&VERTICE_Xyz) || (y&VERTICE_xYz) || (z&VERTICE_xyZ)) n|=VERTICE_xyz;
 		if ((x&VERTICE_XyZ) || (y&VERTICE_xYZ) || (Z&VERTICE_xyz)) n|=VERTICE_xyZ;
@@ -139,6 +149,16 @@ void Grid::block_semi_active(int xx, int yy, int zz, int r, int g, int b)
 		if ((X&VERTICE_xyZ) || (y&VERTICE_XYZ) || (Z&VERTICE_Xyz)) n|=VERTICE_XyZ;
 		if ((X&VERTICE_xYz) || (Y&VERTICE_Xyz) || (z&VERTICE_XYZ)) n|=VERTICE_XYz;
 		if ((X&VERTICE_xYZ) || (Y&VERTICE_XyZ) || (Z&VERTICE_XYz)) n|=VERTICE_XYZ;
+		
+		if (xyz&VERTICE_XYZ) n|=VERTICE_xyz;
+		if (xyZ&VERTICE_XYz) n|=VERTICE_xyZ;
+		if (xYz&VERTICE_XyZ) n|=VERTICE_xYz;
+		if (xYZ&VERTICE_Xyz) n|=VERTICE_xYZ;
+		if (Xyz&VERTICE_xYZ) n|=VERTICE_Xyz;
+		if (XyZ&VERTICE_xYz) n|=VERTICE_XyZ;
+		if (XYz&VERTICE_xyZ) n|=VERTICE_XYz;
+		if (XYZ&VERTICE_xyz) n|=VERTICE_XYZ;
+
 		if (semi_block_valid[n])
 			filled[xx][yy][zz]|=n;
 	}
@@ -149,13 +169,17 @@ void Grid::block_active(int x, int y, int z, int r, int g, int b)
 	{
 		color[x][y][z]=color_manager.getColor(r,g,b);
 		filled[x][y][z]=255;
+		glDeleteLists(display_list,1);
+		display_list=NULL;
 	}
 }
 void Grid::block_delete(int x, int y, int z)
 {
 	if (isPositionValid(x,y,z))
 	{
-		filled[x][y][z]=255;
+		filled[x][y][z]=0;
+		glDeleteLists(display_list,1);
+		display_list=NULL;
 	}
 }
 
@@ -178,28 +202,25 @@ void Grid::generate_display_list()
 	if (display_list!=0)
 		glDeleteLists(display_list,1);
 	
+	// change color model of the block
+	float MatDif[4] = {0.5f, 0.5f, 0.5f, 1.0f};
+	float MatAmb[4] = {0.4f, 0.4f, 0.4f, 1.0f};
+	float MatSpec[4]= {0.1,0.1,0.1,1.0f};
+	float MatShininess[]={1.f};
+
+	glMaterialfv(GL_FRONT,GL_SPECULAR,MatSpec);
+	glMaterialfv(GL_FRONT,GL_AMBIENT,MatAmb);
+	glMaterialfv(GL_FRONT,GL_SHININESS,MatShininess);
+	
 	display_list=glGenLists(1);
 	glLoadIdentity();
 	glNewList(display_list,GL_COMPILE);
 	glPushMatrix();
 	glBegin(GL_TRIANGLES);
-		for(x=1;x<=dimx;++x)
-		{
-			glPushMatrix();
-			for(y=1;y<=dimy;++y)
-			{
-				glPushMatrix();
-				for(z=1;z<=dimz;++z)
-				{
-					generate_display_list(x,y,z);
-					glTranslatef(0.f,0.f,1.f);
-				}
-				glPopMatrix();
-				glTranslatef(0.f,1.f,0.f);
-			}
-			glPopMatrix();
-			glTranslatef(1.f,0.f,0.f);
-		}
+	for(x=1;x<=dimx;++x)
+	for(y=1;y<=dimy;++y)
+	for(z=1;z<=dimz;++z)
+		generate_display_list(x,y,z);
 	glEnd();
 	glPopMatrix();
 	glEndList();;
@@ -246,14 +267,8 @@ void Grid::generate_display_list(int x,int y, int z)
 
 		// change color model of the block
 		float MatDif[4] = {0.5f, 0.5f, 0.5f, 1.0f};
-		float MatAmb[4] = {0.3f, 0.3f, 0.3f, 1.0f};
-		float MatSpec[4]= {0.2f,0.2f,0.2f,1.0f};
-		float MatShininess[]={1.f};
 
-		glMaterialfv(GL_FRONT,GL_SPECULAR,MatSpec);
 		glMaterialfv(GL_FRONT,GL_DIFFUSE,color[x][y][z]);
-		glMaterialfv(GL_FRONT,GL_AMBIENT,MatAmb);
-		glMaterialfv(GL_FRONT,GL_SHININESS,MatShininess);
 
 		for(j=0;j<semi_block_n_face[i];++j)
 		{
@@ -268,12 +283,9 @@ void Grid::generate_display_list(int x,int y, int z)
 				((filled[x+rel_x][y+rel_y][z+rel_z] & op_id) == op_id))
 				continue;
 
-			static int nb=0;
-			nb++;
-			cout<<nb<<endl;
 
 			c=(c+3)%7;
-			glColor3f(Color[c],Color[c+1],Color[c+2]);
+			//glColor3f(Color[c],Color[c+1],Color[c+2]);
 				
 			
 			float triangle[9];
@@ -313,3 +325,10 @@ void Grid::generate_display_list(int x,int y, int z)
 	}
 }
 
+int Grid::get_filled(int x, int y, int z)
+{
+	if (isPositionValid(x,y,z))
+		return filled[x][y][z];
+	else
+		return 0;
+}

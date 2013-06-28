@@ -3,6 +3,8 @@
 #include "grid.h"
 #include "character_free_view.h"
 #include <GL/glu.h>
+#include <cmath>
+
 using namespace sf;
 
 int andom=3;
@@ -11,12 +13,14 @@ int Random()
 	andom+=7;
 	andom*=13;
 	andom+=andom%10;
-	return  255+0*andom%155;
+	return  50+(andom%200);
 }
 
 bool z_ok(int x,int y,int z)
 {
-	return z<3+((x%2+x%5)%2 + (y%2+y%3)%2)%2+y;
+	//return z<10-10*cos(float(x)*0.1)*cos(float(y)*0.1);
+	//return z<3+((x%2+x%5)%2 + (y%2+y%3)%2)%2;
+	return z<4+3*sin(float(x*y)*0.01);;
 }
 
 int main()
@@ -26,28 +30,31 @@ int main()
     window.setVerticalSyncEnabled(true);
 
 	Grid g;
-	g.set_dimension(25,25,25);
+	int grid_dimx=100;
+	int grid_dimy=100;
+	int grid_dimz=40;
+	g.set_dimension(grid_dimx,grid_dimy,grid_dimz);
 	
 
-	for(int x=0;x<25;++x)
-	for(int y=0;y<25;++y)
-	for(int z=0;z<25;++z)
+	for(int x=0;x<grid_dimx;++x)
+	for(int y=0;y<grid_dimy;++y)
+	for(int z=0;z<grid_dimz;++z)
 	{
 		if (z_ok(x,y,z))
 			g.block_active(x,y,z,
-					Random()/(z+1),
+					Random(),
 					Random(),
 					Random()
 					);
 	}
 
-	for(int k=0;k<2;++k)
-	for(int x=0;x<25;++x)
-	for(int y=0;y<25;++y)
-	for(int z=0;z<25;++z)
+	for(int k=0;k<10;++k)
+	for(int x=0;x<grid_dimx;++x)
+	for(int y=0;y<grid_dimy;++y)
+	for(int z=0;z<grid_dimz;++z)
 	{
 			g.block_semi_active(x,y,z,
-					Random()/(z+1),
+					Random(),
 					Random(),
 					Random()
 					);
@@ -66,14 +73,14 @@ int main()
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(90.f, 1.f, 1.f, 500.f);
+    gluPerspective(70.f, 1.f, 1.f, 500.f);
 	//glOrtho(-1,1,-1,1,-100,100);
 
 	glMatrixMode(GL_MODELVIEW);
 	 
-	float Light1Pos[4] = {-1.5f, -1.5f, 5.5, 1.0f};
-	float Light1Dif[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-	float Light1Spec[4] = {1.0f, 1.f, 1.f, 1.0f};
+	float Light1Pos[4] = {25.f, -25.f, 50.5, 1.0f};
+	float Light1Dif[4] = {0.5f, 0.5f, 0.5f, 1.0f};
+	float Light1Spec[4] = {0.5f, 0.5f, 0.5f, 1.0f};
 	float Light1Amb[4] = {0.1f, 0.1f, 0.1f, 1.0f};
 
 	GLfloat  matShininess[]={50.0};
@@ -137,6 +144,9 @@ int main()
 
 		if (Keyboard::isKeyPressed(sf::Keyboard::Down))
 			character.move_backward();
+	
+		if (Mouse::isButtonPressed(Mouse::Left))
+			character.mouse_click();
 
 
 		Vector2i position = sf::Mouse::getPosition(window);

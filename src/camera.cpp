@@ -22,9 +22,8 @@ void Camera::move_forward(float increment)
 
 void Camera::move_laterally(float increment)
 {
-	x+=increment*sin(angle_xy)*cos(angle_xz);
-	y+=-increment*cos(angle_xy)*cos(angle_xz);
-	z+=increment*sin(angle_xz);
+	x+=increment*sin(angle_xy);
+	y+=-increment*cos(angle_xy);
 }
 void Camera::angle_xy_change(float increment)
 {
@@ -43,4 +42,16 @@ void Camera::get_view()
 	glRotatef(angle_xz*RADTODEG,0.f,1.f,0.f);
 	glRotatef(-angle_xy*RADTODEG,0.f,0.f,1.f);
 	glTranslatef(-x,-y,-z);
+}
+
+Ray Camera::get_ray()
+{
+	Ray ray;
+	ray.set_position(x,y,z);
+	ray.set_direction(
+		cos(angle_xy)*cos(angle_xz),
+		sin(angle_xy)*cos(angle_xz),
+		sin(angle_xz)
+	);
+	return ray;
 }

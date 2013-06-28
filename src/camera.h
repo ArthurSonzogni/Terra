@@ -3,6 +3,7 @@
 
 #define RADTODEG 57.2957795131
 #define DEGTORAD 0.01745329252
+#include "ray.h"
 
 class Camera
 {
@@ -16,6 +17,7 @@ class Camera
 		void move_laterally(float increment);
 		void angle_xy_change(float increment);
 		void angle_xz_change(float increment);
+		Ray get_ray();
 
 		void get_view();
 };

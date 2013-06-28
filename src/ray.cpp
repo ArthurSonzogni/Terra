@@ -26,6 +26,9 @@ void Ray::set_position(float X,float Y,float Z)
 	x=X;
 	y=Y;
 	z=Z;
+	p_x=x;
+	p_y=y;
+	p_z=z;
 }
 
 void Ray::set_direction(float DX, float DY, float DZ)
@@ -77,6 +80,17 @@ void Ray::increment()
 	p_x+=t*dx;
 	p_y+=t*dy;
 	p_z+=t*dz;
+}
+
+void Ray::decrement()
+{
+	dx=-dx;
+	dy=-dy;
+	dz=-dz;
+	increment();
+	dx=-dx;
+	dy=-dy;
+	dz=-dz;
 }
 
 void Ray::get_current_position(int* X,int* Y,int *Z)
