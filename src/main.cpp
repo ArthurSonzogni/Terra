@@ -29,15 +29,14 @@ bool z_ok(int x,int y,int z)
 
 int main()
 {
-	Game_physic gm;
 
     // crée la fenêtre
     sf::Window window(sf::VideoMode(800, 600), "OpenGL", sf::Style::Default, sf::ContextSettings(32));
     window.setVerticalSyncEnabled(true);
 
 	Grid g;
-	int grid_dimx=100;
-	int grid_dimy=100;
+	int grid_dimx=50;
+	int grid_dimy=50;
 	int grid_dimz=21;
 	g.set_dimension(grid_dimx,grid_dimy,grid_dimz);
 	
@@ -108,6 +107,16 @@ int main()
 	position.y=300;
 	Mouse::setPosition(position,window);
 	//character.camera.z=0;
+	
+	// Game_physic
+	Game_physic gm;
+	gm.add_sphere(20,20,25);
+	btBvhTriangleMeshShape* mesh;
+	mesh=g.get_mesh();
+	gm.set_world_mesh(mesh);
+		
+	
+
 
     // la boucle principale
     bool running = true;
@@ -163,12 +172,24 @@ int main()
 		character.get_view();
 		glLightfv(GL_LIGHT0, GL_POSITION, Light1Pos);
 		g.draw();
+		
+		btTransform tr=gm.get_sphere_transformation(0);
+				gm.stepSimulation();
+		// sphere draw
+		{
+			GLUquadricObj *quadric=gluNewQuadric();
+			gluQuadricNormals(quadric, GLU_SMOOTH);
+			btScalar m[16];
+			glPushMatrix();
+			tr.getOpenGLMatrix(m);
+			glMultMatrixf((GLfloat*)m);
+			gluSphere(quadric, 1.0f,100,100);
+			glPopMatrix();
+			gluDeleteQuadric(quadric);
+		}
 
-        // termine la trame courante (en interne, échange les deux tampons de rendu)
-        window.display();
+		window.display();
     }
 
-    // libération des ressources...
-
-    return 0;
+	return 0;
 }

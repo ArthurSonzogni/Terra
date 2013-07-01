@@ -19,6 +19,9 @@ class Game_physic
 		btDiscreteDynamicsWorld* dynamicsWorld;
 		
 		vector<btRigidBody*> sphere;
+		
+		btBvhTriangleMeshShape* world_mesh;
+		void delete_world_mesh();
 	public:
 		Game_physic();
 		~Game_physic();
@@ -27,6 +30,9 @@ class Game_physic
 		void add_sphere(int x, int y, int z);
 		void remove_sphere(int index);
 		btTransform get_sphere_transformation(int index);
+
+		// world mesh function
+		void set_world_mesh(btBvhTriangleMeshShape* mesh);
 
 		// world related function
 		void stepSimulation();

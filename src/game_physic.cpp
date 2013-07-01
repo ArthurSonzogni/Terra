@@ -12,7 +12,8 @@ Game_physic::Game_physic()
 			broadphase,
 			solver,
 			collisionConfiguration);
-	dynamicsWorld->setGravity(btVector3(0,-10,0));
+	dynamicsWorld->setGravity(btVector3(0,0,-10));
+	world_mesh=NULL;
 }
 
 Game_physic::~Game_physic()
@@ -75,7 +76,38 @@ btTransform Game_physic::get_sphere_transformation(int index)
 
 void Game_physic::stepSimulation()
 {
-	dynamicsWorld->stepSimulation(1.0/60.f,10);
+	dynamicsWorld->stepSimulation(1.0/35.f,10);
+}
+
+void Game_physic::delete_world_mesh()
+{
+	if (world_mesh!=NULL)
+	{
+		delete world_mesh;	
+		world_mesh=NULL;
+	}
+}
+
+void Game_physic::set_world_mesh(btBvhTriangleMeshShape* mesh)
+{
+	if (world_mesh) delete_world_mesh();
+	world_mesh=mesh;
+	btDefaultMotionState* motionState = new btDefaultMotionState(
+													btTransform(
+														btQuaternion(0,0,0,1),
+														btVector3(0,0,0)
+														)
+													);
+	btScalar mass = 0;
+	btVector3 inertia(0,0,0);
+	btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(
+			mass,
+			motionState,
+			world_mesh,
+			inertia);
+	btRigidBody* rigidBody = new btRigidBody(rigidBodyCI);
+	dynamicsWorld->addRigidBody(rigidBody);
+	
 }
 
 /*
