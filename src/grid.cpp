@@ -123,41 +123,69 @@ void Grid::block_semi_active(int xx, int yy, int zz, int r, int g, int b)
 	if (isPositionValid(xx,yy,zz))
 	{
 		color[xx][yy][zz]=color_manager.getColor(r,g,b);
-		filled[xx][yy][zz]=0;
-		int z=filled[xx][yy][zz-1];
-		int Z=filled[xx][yy][zz+1];
-		int y=filled[xx][yy-1][zz];
-		int Y=filled[xx][yy+1][zz];
-		int x=filled[xx-1][yy][zz];
-		int X=filled[xx+1][yy][zz];
-
-		int xyz=filled[xx-1][yy-1][zz-1];
-		int xyZ=filled[xx-1][yy-1][zz+1];
-		int xYz=filled[xx-1][yy+1][zz-1];
-		int xYZ=filled[xx-1][yy+1][zz+1];
-		int Xyz=filled[xx+1][yy-1][zz-1];
-		int XyZ=filled[xx+1][yy-1][zz+1];
-		int XYz=filled[xx+1][yy+1][zz-1];
-		int XYZ=filled[xx+1][yy+1][zz+1];
-
-		int n=0;
-		if ((x&VERTICE_Xyz) || (y&VERTICE_xYz) || (z&VERTICE_xyZ)) n|=VERTICE_xyz;
-		if ((x&VERTICE_XyZ) || (y&VERTICE_xYZ) || (Z&VERTICE_xyz)) n|=VERTICE_xyZ;
-		if ((x&VERTICE_XYz) || (Y&VERTICE_xyz) || (z&VERTICE_xYZ)) n|=VERTICE_xYz;
-		if ((x&VERTICE_XYZ) || (Y&VERTICE_xyZ) || (Z&VERTICE_xYz)) n|=VERTICE_xYZ;
-		if ((X&VERTICE_xyz) || (y&VERTICE_XYz) || (z&VERTICE_XyZ)) n|=VERTICE_Xyz;
-		if ((X&VERTICE_xyZ) || (y&VERTICE_XYZ) || (Z&VERTICE_Xyz)) n|=VERTICE_XyZ;
-		if ((X&VERTICE_xYz) || (Y&VERTICE_Xyz) || (z&VERTICE_XYZ)) n|=VERTICE_XYz;
-		if ((X&VERTICE_xYZ) || (Y&VERTICE_XyZ) || (Z&VERTICE_XYz)) n|=VERTICE_XYZ;
 		
-		if (xyz&VERTICE_XYZ) n|=VERTICE_xyz;
-		if (xyZ&VERTICE_XYz) n|=VERTICE_xyZ;
-		if (xYz&VERTICE_XyZ) n|=VERTICE_xYz;
-		if (xYZ&VERTICE_Xyz) n|=VERTICE_xYZ;
-		if (Xyz&VERTICE_xYZ) n|=VERTICE_Xyz;
-		if (XyZ&VERTICE_xYz) n|=VERTICE_XyZ;
-		if (XYz&VERTICE_xyZ) n|=VERTICE_XYz;
-		if (XYZ&VERTICE_xyz) n|=VERTICE_XYZ;
+		int n=0;
+		int x,y,z;
+		int vx,vy,vz;
+		int dx,dy,dz;
+		for(x=-1;x<=1;++x)
+		for(y=-1;y<=1;++y)
+		for(z=-1;z<=1;++z)
+		{
+			for(vx=0;vx<=1;vx++)
+			for(vy=0;vy<=1;vy++)
+			for(vz=0;vz<=1;vz++)
+			{
+				if (get_vertice[vx][vy][vz] & filled[xx+x][yy+y][zz+z])
+				{
+					dx=x+vx;
+					dy=y+vy;
+					dz=z+vz;
+					if ((dx==0 or dx==1) and
+						(dy==0 or dy==1) and
+						(dz==0 or dz==1))
+					{
+						n|=get_vertice[dx][dy][dz];
+					}
+				}
+			}
+		}
+
+		//filled[xx][yy][zz]=0;
+		//int z=filled[xx][yy][zz-1];
+		//int Z=filled[xx][yy][zz+1];
+		//int y=filled[xx][yy-1][zz];
+		//int Y=filled[xx][yy+1][zz];
+		//int x=filled[xx-1][yy][zz];
+		//int X=filled[xx+1][yy][zz];
+
+		//int xyz=filled[xx-1][yy-1][zz-1];
+		//int xyZ=filled[xx-1][yy-1][zz+1];
+		//int xYz=filled[xx-1][yy+1][zz-1];
+		//int xYZ=filled[xx-1][yy+1][zz+1];
+		//int Xyz=filled[xx+1][yy-1][zz-1];
+		//int XyZ=filled[xx+1][yy-1][zz+1];
+		//int XYz=filled[xx+1][yy+1][zz-1];
+		//int XYZ=filled[xx+1][yy+1][zz+1];
+
+		//int n=0;
+		//if ((x&VERTICE_Xyz) || (y&VERTICE_xYz) || (z&VERTICE_xyZ)) n|=VERTICE_xyz;
+		//if ((x&VERTICE_XyZ) || (y&VERTICE_xYZ) || (Z&VERTICE_xyz)) n|=VERTICE_xyZ;
+		//if ((x&VERTICE_XYz) || (Y&VERTICE_xyz) || (z&VERTICE_xYZ)) n|=VERTICE_xYz;
+		//if ((x&VERTICE_XYZ) || (Y&VERTICE_xyZ) || (Z&VERTICE_xYz)) n|=VERTICE_xYZ;
+		//if ((X&VERTICE_xyz) || (y&VERTICE_XYz) || (z&VERTICE_XyZ)) n|=VERTICE_Xyz;
+		//if ((X&VERTICE_xyZ) || (y&VERTICE_XYZ) || (Z&VERTICE_Xyz)) n|=VERTICE_XyZ;
+		//if ((X&VERTICE_xYz) || (Y&VERTICE_Xyz) || (z&VERTICE_XYZ)) n|=VERTICE_XYz;
+		//if ((X&VERTICE_xYZ) || (Y&VERTICE_XyZ) || (Z&VERTICE_XYz)) n|=VERTICE_XYZ;
+		
+		//if (xyz&VERTICE_XYZ) n|=VERTICE_xyz;
+		//if (xyZ&VERTICE_XYz) n|=VERTICE_xyZ;
+		//if (xYz&VERTICE_XyZ) n|=VERTICE_xYz;
+		//if (xYZ&VERTICE_Xyz) n|=VERTICE_xYZ;
+		//if (Xyz&VERTICE_xYZ) n|=VERTICE_Xyz;
+		//if (XyZ&VERTICE_xYz) n|=VERTICE_XyZ;
+		//if (XYz&VERTICE_xyZ) n|=VERTICE_XYz;
+		//if (XYZ&VERTICE_xyz) n|=VERTICE_XYZ;
 
 		if (semi_block_valid[n])
 			filled[xx][yy][zz]|=n;
@@ -170,7 +198,7 @@ void Grid::block_active(int x, int y, int z, int r, int g, int b)
 		color[x][y][z]=color_manager.getColor(r,g,b);
 		filled[x][y][z]=255;
 		glDeleteLists(display_list,1);
-		display_list=NULL;
+		display_list=0;
 	}
 }
 void Grid::block_delete(int x, int y, int z)
@@ -179,7 +207,7 @@ void Grid::block_delete(int x, int y, int z)
 	{
 		filled[x][y][z]=0;
 		glDeleteLists(display_list,1);
-		display_list=NULL;
+		display_list=0;
 	}
 }
 
@@ -203,9 +231,9 @@ void Grid::generate_display_list()
 		glDeleteLists(display_list,1);
 	
 	// change color model of the block
-	float MatDif[4] = {0.5f, 0.5f, 0.5f, 1.0f};
-	float MatAmb[4] = {0.4f, 0.4f, 0.4f, 1.0f};
-	float MatSpec[4]= {0.1,0.1,0.1,1.0f};
+	float MatDif[4] = {0.6f, 0.6f, 0.6f, 1.0f};
+	float MatAmb[4] = {0.1f, 0.1f, 0.1f, 1.0f};
+	float MatSpec[4]= {0.5,0.5,0.5,1.0f};
 	float MatShininess[]={1.f};
 
 	glMaterialfv(GL_FRONT,GL_SPECULAR,MatSpec);
@@ -332,3 +360,78 @@ int Grid::get_filled(int x, int y, int z)
 	else
 		return 0;
 }
+
+btBvhTriangleMeshShape* Grid::get_mesh()
+{
+	btTriangleMesh* m = new btTriangleMesh();
+	int x,y,z;
+	for(x=1;x<=dimx;++x)
+	for(y=1;y<=dimy;++y)
+	for(z=1;z<=dimz;++z)
+		block_get_mesh(m,x,y,z);
+
+	btBvhTriangleMeshShape* shape = new btBvhTriangleMeshShape(m,true,true);
+	return shape;
+}
+void Grid::block_get_mesh(btTriangleMesh* m,int x, int y,int z)
+{
+	int i,j,k;
+	if (filled[x][y][z])
+	{
+		if (filled[x-1][y][z]==255 &&
+			filled[x+1][y][z]==255 &&
+			filled[x][y-1][z]==255 &&
+			filled[x][y+1][z]==255 &&
+			filled[x][y][z-1]==255 &&
+			filled[x][y][z+1]==255)
+		return;
+		static int c=0;
+		i=filled[x][y][z];
+
+		for(j=0;j<semi_block_n_face[i];++j)
+		{
+			// if this triangle touch another triangle of the opposite
+			// semi_block, we abort its computation
+			int face_id=semi_block_face_id[i][j];
+			int op_id=semi_block_face_id_get_opposite_id[face_id];	
+			int rel_x=semi_block_face_id_get_opposite_rel_x[face_id];	
+			int rel_y=semi_block_face_id_get_opposite_rel_y[face_id];	
+			int rel_z=semi_block_face_id_get_opposite_rel_z[face_id];	
+			if (op_id!=0 and 
+				((filled[x+rel_x][y+rel_y][z+rel_z] & op_id) == op_id))
+				continue;
+
+			float triangle[9];
+			for(k=0;k<3;k++)
+			{
+				int vertice=semi_block_face[i][3*j+k];
+				triangle[3*k+0]=semi_block_vertice[i][3*vertice+0];
+				triangle[3*k+1]=semi_block_vertice[i][3*vertice+1];
+				triangle[3*k+2]=semi_block_vertice[i][3*vertice+2];
+
+			}
+			// triangle computation
+			{
+				btVector3 A(
+						triangle[0]+x,
+						triangle[1]+y,
+						triangle[2]+z
+				);
+				btVector3 B(
+						triangle[3]+x,
+						triangle[4]+y,
+						triangle[5]+z
+				);
+				btVector3 C(
+						triangle[6]+x,
+						triangle[7]+y,
+						triangle[8]+z
+				);
+				m->addTriangle(A,B,C,false);
+			}
+		}
+	}
+}
+
+
+	

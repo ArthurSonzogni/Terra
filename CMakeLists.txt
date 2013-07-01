@@ -6,10 +6,14 @@ set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
 include_directories(sfml2_include)
 link_directories(sfml2_lib)
 
+#add bullet physics
+include_directories(/usr/local/include/bullet)
+link_directories(/usr/local/lib)
+
 # executable configuration
 file(GLOB_RECURSE source_file src/*)
 add_executable(terra ${source_file})
 
 # link configuration
-target_link_libraries(terra sfml-audio sfml-graphics sfml-window sfml-system GL
+target_link_libraries(terra BulletDynamics.so BulletCollision LinearMath sfml-audio sfml-graphics sfml-window sfml-system GL
 	GLU glut)

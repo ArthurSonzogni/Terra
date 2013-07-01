@@ -5,6 +5,7 @@
 #include <SFML/OpenGL.hpp>
 #include "color_manager.h"
 #include <list>
+#include <btBulletDynamicsCommon.h>
 
 using namespace std;
 
@@ -39,6 +40,7 @@ class Grid
 		bool display_list_is_generated;
 		void generate_display_list();
 		void generate_display_list(int x,int y, int z);
+		void block_get_mesh(btTriangleMesh* m,int x,int y,int z);
 
 	public:
 		Grid();
@@ -48,6 +50,7 @@ class Grid
 		void block_active(int x, int y, int z, int r, int g, int b);
 		void block_delete(int x, int y, int z);
 		void draw();
+		btBvhTriangleMeshShape* get_mesh();
 		
 		int get_filled(int x, int y, int z);
 		

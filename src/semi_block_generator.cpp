@@ -1,6 +1,7 @@
 #include "semi_block_generator.h"
 #include "convexHull.h"   
 #include <iostream>
+#include <cstdlib>
 using namespace std;
 
 float* semi_block_vertice[256];
@@ -13,6 +14,7 @@ int semi_block_face_id_get_opposite_rel_x[256];
 int semi_block_face_id_get_opposite_rel_y[256];
 int semi_block_face_id_get_opposite_rel_z[256];
 bool semi_block_valid[256];
+int get_vertice[2][2][2];
 
 class semi_block_generator_filler
 {
@@ -188,6 +190,18 @@ semi_block_generator_filler::semi_block_generator_filler()
 			// Zface
 			(i&0b10101010);
 	}
+	
+	/****************
+	 * 	get_vertice
+	 * **************/
+	get_vertice[0][0][0]=VERTICE_xyz;
+	get_vertice[0][0][1]=VERTICE_xyZ;
+	get_vertice[0][1][0]=VERTICE_xYz;
+	get_vertice[0][1][1]=VERTICE_xYZ;
+	get_vertice[1][0][0]=VERTICE_Xyz;
+	get_vertice[1][0][1]=VERTICE_XyZ;
+	get_vertice[1][1][0]=VERTICE_XYz;
+	get_vertice[1][1][1]=VERTICE_XYZ;
 }
 
 // I define a class that is instanciate juste after its declaration
@@ -198,8 +212,8 @@ semi_block_generator_filler::~semi_block_generator_filler()
 {
 	for(int i=0;i<256;++i)
 	{
-		delete[] semi_block_vertice[i];
-		delete[] semi_block_face[i];
+		free(semi_block_vertice[i]);
+		free(semi_block_face[i]);
 		delete[] semi_block_face_id[i];
 	}
 }

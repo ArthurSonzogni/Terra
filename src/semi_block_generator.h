@@ -11,6 +11,7 @@ extern int semi_block_face_id_get_opposite_rel_x[256];
 extern int semi_block_face_id_get_opposite_rel_y[256];
 extern int semi_block_face_id_get_opposite_rel_z[256];
 extern bool semi_block_valid[256];
+extern int get_vertice[2][2][2];
 
 
 #define VERTICE_xyz	1
