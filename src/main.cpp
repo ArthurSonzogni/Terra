@@ -5,6 +5,8 @@
 #include <GL/glu.h>
 #include <cmath>
 #include "game_physic.h"
+#include <SFML/System.hpp>
+#include "texture.h"
 
 using namespace sf;
 
@@ -120,8 +122,10 @@ int main()
 
     // la boucle principale
     bool running = true;
+	Clock c;
     while (running)
     {
+		c.restart();
         // gestion des évènements
         sf::Event event;
         while (window.pollEvent(event))
@@ -174,7 +178,6 @@ int main()
 		g.draw();
 		
 		btTransform tr=gm.get_sphere_transformation(0);
-				gm.stepSimulation();
 		// sphere draw
 		{
 			GLUquadricObj *quadric=gluNewQuadric();
@@ -183,12 +186,16 @@ int main()
 			glPushMatrix();
 			tr.getOpenGLMatrix(m);
 			glMultMatrixf((GLfloat*)m);
-			gluSphere(quadric, 1.0f,100,100);
+			gluSphere(quadric, 1.0f,10,10);
 			glPopMatrix();
 			gluDeleteQuadric(quadric);
 		}
-
+		gm.stepSimulation(1.0/30.0);
 		window.display();
+
+		double time_elapsed=c.getElapsedTime().asSeconds();;
+		cout<<(time_elapsed*30.0)<<endl;
+		sf::sleep(sf::seconds(1./30.-time_elapsed));
     }
 
 	return 0;

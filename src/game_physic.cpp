@@ -74,9 +74,11 @@ btTransform Game_physic::get_sphere_transformation(int index)
 	return trans;
 }
 
-void Game_physic::stepSimulation()
+void Game_physic::stepSimulation(float time)
 {
-	dynamicsWorld->stepSimulation(1.0/35.f,10);
+	dynamicsWorld->stepSimulation(time,2);
+	//sphere[0]->applyCentralForce(btVector3(5,0,0));
+	sphere[0]->applyTorqueImpulse(btVector3(0.1,0,0));
 }
 
 void Game_physic::delete_world_mesh()

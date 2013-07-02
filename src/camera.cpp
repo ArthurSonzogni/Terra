@@ -36,7 +36,6 @@ void Camera::angle_xz_change(float increment)
 
 void Camera::get_view()
 {
-	cout<<x<<" "<<y<<" "<<z<<" "<<angle_xy<<" "<<angle_xz<<endl;
 	glLoadIdentity();
 	gluLookAt(0,0,0,1,0,0,0,0,1);
 	glRotatef(angle_xz*RADTODEG,0.f,1.f,0.f);

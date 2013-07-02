@@ -35,7 +35,7 @@ class Game_physic
 		void set_world_mesh(btBvhTriangleMeshShape* mesh);
 
 		// world related function
-		void stepSimulation();
+		void stepSimulation(float time);
 		
 };
 
