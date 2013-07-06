@@ -1,5 +1,6 @@
 #include "grid.h"
 #include "semi_block_generator.h"
+#include "texture.h"
 
 Grid::Grid():
 	dimx(0),
@@ -151,42 +152,6 @@ void Grid::block_semi_active(int xx, int yy, int zz, int r, int g, int b)
 			}
 		}
 
-		//filled[xx][yy][zz]=0;
-		//int z=filled[xx][yy][zz-1];
-		//int Z=filled[xx][yy][zz+1];
-		//int y=filled[xx][yy-1][zz];
-		//int Y=filled[xx][yy+1][zz];
-		//int x=filled[xx-1][yy][zz];
-		//int X=filled[xx+1][yy][zz];
-
-		//int xyz=filled[xx-1][yy-1][zz-1];
-		//int xyZ=filled[xx-1][yy-1][zz+1];
-		//int xYz=filled[xx-1][yy+1][zz-1];
-		//int xYZ=filled[xx-1][yy+1][zz+1];
-		//int Xyz=filled[xx+1][yy-1][zz-1];
-		//int XyZ=filled[xx+1][yy-1][zz+1];
-		//int XYz=filled[xx+1][yy+1][zz-1];
-		//int XYZ=filled[xx+1][yy+1][zz+1];
-
-		//int n=0;
-		//if ((x&VERTICE_Xyz) || (y&VERTICE_xYz) || (z&VERTICE_xyZ)) n|=VERTICE_xyz;
-		//if ((x&VERTICE_XyZ) || (y&VERTICE_xYZ) || (Z&VERTICE_xyz)) n|=VERTICE_xyZ;
-		//if ((x&VERTICE_XYz) || (Y&VERTICE_xyz) || (z&VERTICE_xYZ)) n|=VERTICE_xYz;
-		//if ((x&VERTICE_XYZ) || (Y&VERTICE_xyZ) || (Z&VERTICE_xYz)) n|=VERTICE_xYZ;
-		//if ((X&VERTICE_xyz) || (y&VERTICE_XYz) || (z&VERTICE_XyZ)) n|=VERTICE_Xyz;
-		//if ((X&VERTICE_xyZ) || (y&VERTICE_XYZ) || (Z&VERTICE_Xyz)) n|=VERTICE_XyZ;
-		//if ((X&VERTICE_xYz) || (Y&VERTICE_Xyz) || (z&VERTICE_XYZ)) n|=VERTICE_XYz;
-		//if ((X&VERTICE_xYZ) || (Y&VERTICE_XyZ) || (Z&VERTICE_XYz)) n|=VERTICE_XYZ;
-		
-		//if (xyz&VERTICE_XYZ) n|=VERTICE_xyz;
-		//if (xyZ&VERTICE_XYz) n|=VERTICE_xyZ;
-		//if (xYz&VERTICE_XyZ) n|=VERTICE_xYz;
-		//if (xYZ&VERTICE_Xyz) n|=VERTICE_xYZ;
-		//if (Xyz&VERTICE_xYZ) n|=VERTICE_Xyz;
-		//if (XyZ&VERTICE_xYz) n|=VERTICE_XyZ;
-		//if (XYz&VERTICE_xyZ) n|=VERTICE_XYz;
-		//if (XYZ&VERTICE_xyz) n|=VERTICE_XYZ;
-
 		if (semi_block_valid[n])
 			filled[xx][yy][zz]|=n;
 	}
@@ -243,6 +208,7 @@ void Grid::generate_display_list()
 	display_list=glGenLists(1);
 	glLoadIdentity();
 	glNewList(display_list,GL_COMPILE);
+	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_block));
 	glPushMatrix();
 	glBegin(GL_TRIANGLES);
 	for(x=1;x<=dimx;++x)
@@ -332,16 +298,30 @@ void Grid::generate_display_list(int x,int y, int z)
 				glNormal3f(nx,ny,nz);
 			}
 			// triangle draw
+			float texture_position[2];
+			texture_block_get_position(texture_block_gravel,texture_position);
 			{
+				glTexCoord2d(
+							texture_position[0]+triangle[0]*TEXT_X_INC2,
+							texture_position[1]+triangle[1]*TEXT_Y_INC2
+				);
 				glVertex3f(
 						triangle[0]+x,
 						triangle[1]+y,
 						triangle[2]+z
 				);
+				glTexCoord2d(
+							texture_position[0]+triangle[3]*TEXT_X_INC2,
+							texture_position[1]+triangle[4]*TEXT_Y_INC2
+				);
 				glVertex3f(
 						triangle[3]+x,
 						triangle[4]+y,
 						triangle[5]+z
+				);
+				glTexCoord2d(
+							texture_position[0]+triangle[6]*TEXT_X_INC2,
+							texture_position[1]+triangle[7]*TEXT_Y_INC2
 				);
 				glVertex3f(
 						triangle[6]+x,

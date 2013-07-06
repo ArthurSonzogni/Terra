@@ -227,7 +227,7 @@ Chull3D::double_triangle (void)
   while (are_collinear (v0, v0->next, v0->next->next))   
     if ( (v0=v0->next) == vertices)   
       {   
-    printf ("All the vertices are collinear\n");   
+    //printf ("All the vertices are collinear\n");   
     return 1;   
       }   
   v1 = v0->next;   
@@ -258,7 +258,7 @@ Chull3D::double_triangle (void)
     {   
       if ( (v3=v3->next) == v0)   
     {   
-      printf ("All the vertices are coplanar\n");   
+      //printf ("All the vertices are coplanar\n");   
       return 1;   
     }   
       vol = volume_sign (f0, v3);   

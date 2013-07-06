@@ -1,3 +1,4 @@
+#include <GL/glew.h>
 #include <SFML/Window.hpp>
 #include <SFML/OpenGL.hpp>
 #include "grid.h"
@@ -7,6 +8,8 @@
 #include "game_physic.h"
 #include <SFML/System.hpp>
 #include "texture.h"
+#include "shader.h"
+
 
 using namespace sf;
 
@@ -36,9 +39,14 @@ int main()
     sf::Window window(sf::VideoMode(800, 600), "OpenGL", sf::Style::Default, sf::ContextSettings(32));
     window.setVerticalSyncEnabled(true);
 
+	// shader
+	Shader shader;
+	GLuint program=shader.loadProgram("shader/simple_vertex_shader","shader/simple_pixel_shader");
+	glUseProgram(program);
+
 	Grid g;
-	int grid_dimx=50;
-	int grid_dimy=50;
+	int grid_dimx=100;
+	int grid_dimy=100;
 	int grid_dimz=21;
 	g.set_dimension(grid_dimx,grid_dimy,grid_dimz);
 	
@@ -80,14 +88,14 @@ int main()
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(70.f, 1.f, 1.f, 500.f);
+    gluPerspective(70.f, 1.f, 0.01f, 500.f);
 	//glOrtho(-1,1,-1,1,-100,100);
 
 	glMatrixMode(GL_MODELVIEW);
 	 
 	float Light1Pos[4] = {25.f, 25.f, 1000.5, 1.0f};
 	float Light1Dif[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-	float Light1Spec[4] = {1.0f, 0.0f, 1.0f, 1.0f};
+	float Light1Spec[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 	float Light1Amb[4] = {0.1f, 0.1f, 0.1f, 1.0f};
 
 	GLfloat  matShininess[]={1.0};
@@ -112,12 +120,15 @@ int main()
 	
 	// Game_physic
 	Game_physic gm;
-	gm.add_sphere(20,20,25);
+	for(int i=0;i<20;++i)
+	gm.add_sphere(20+2*i,20+2*i,25);
 	btBvhTriangleMeshShape* mesh;
 	mesh=g.get_mesh();
 	gm.set_world_mesh(mesh);
 		
-	
+
+	// texture
+	Texture_loader tl;	
 
 
     // la boucle principale
@@ -177,16 +188,19 @@ int main()
 		glLightfv(GL_LIGHT0, GL_POSITION, Light1Pos);
 		g.draw();
 		
-		btTransform tr=gm.get_sphere_transformation(0);
-		// sphere draw
+		for(int i=0;i<20;++i)
 		{
+			btTransform tr=gm.get_sphere_transformation(i);
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
 			GLUquadricObj *quadric=gluNewQuadric();
 			gluQuadricNormals(quadric, GLU_SMOOTH);
+			gluQuadricTexture(quadric, GL_TRUE);
 			btScalar m[16];
 			glPushMatrix();
 			tr.getOpenGLMatrix(m);
 			glMultMatrixf((GLfloat*)m);
-			gluSphere(quadric, 1.0f,10,10);
+			gluSphere(quadric, 1.0f,20,20);
 			glPopMatrix();
 			gluDeleteQuadric(quadric);
 		}

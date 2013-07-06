@@ -1,11 +1,13 @@
 #include "texture.h"
 #include <SFML/Graphics.hpp>
+
 using namespace sf;
 
 // texture location
 const char* texture_location[]=
 {
-	"img/text_grass.jpg"
+	"image/text_block.jpg",
+	"image/text_ball.jpg"
 };
 
 GLuint texture_id[texture_enum_max];
@@ -14,13 +16,6 @@ GLuint get_texture_id(int i)
 	return texture_id[i];
 };
 
-// a class to load texture before the main
-class Texture_loader
-{
-	public:
-		Texture_loader();
-		~Texture_loader();
-};
 
 
 
@@ -37,6 +32,7 @@ Texture_loader::Texture_loader()
         gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, image.getSize().x, image.getSize().y, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		texture_id[i]=texture;
 	}
 }
 
@@ -50,4 +46,8 @@ Texture_loader::~Texture_loader()
 }
 
 
-Texture_loader t;
+void texture_block_get_position(int id, float* position)
+{
+	position[0]=float(id%TEXT_X_N)*TEXT_X_INC;
+	position[1]=float(id%TEXT_Y_N)*TEXT_Y_INC;
+}

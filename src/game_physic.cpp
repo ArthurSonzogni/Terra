@@ -54,6 +54,7 @@ void Game_physic::add_sphere(int x, int y, int z)
 	dynamicsWorld->addRigidBody(rigidBody);
 	
 	sphere.push_back(rigidBody);
+	sphere.back()->applyTorqueImpulse(btVector3(10,0,0));
 }
 void Game_physic::remove_sphere(int index)
 {
@@ -78,7 +79,7 @@ void Game_physic::stepSimulation(float time)
 {
 	dynamicsWorld->stepSimulation(time,2);
 	//sphere[0]->applyCentralForce(btVector3(5,0,0));
-	sphere[0]->applyTorqueImpulse(btVector3(0.1,0,0));
+	//sphere[0]->applyTorqueImpulse(btVector3(0.1,0,0));
 }
 
 void Game_physic::delete_world_mesh()
