@@ -76,7 +76,6 @@ int main()
 	}
 
 	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	
@@ -188,11 +187,16 @@ int main()
 		glLightfv(GL_LIGHT0, GL_POSITION, Light1Pos);
 		g.draw();
 		
+		{
+			GLint location = glGetUniformLocation(program, "tex");
+	    	glUniform1i(location,0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
+			glBindSampler(0,0);
+		}
 		for(int i=0;i<20;++i)
 		{
 			btTransform tr=gm.get_sphere_transformation(i);
-			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
 			GLUquadricObj *quadric=gluNewQuadric();
 			gluQuadricNormals(quadric, GLU_SMOOTH);
 			gluQuadricTexture(quadric, GL_TRUE);

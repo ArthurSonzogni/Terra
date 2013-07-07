@@ -199,7 +199,7 @@ void Grid::generate_display_list()
 	float MatDif[4] = {0.6f, 0.6f, 0.6f, 1.0f};
 	float MatAmb[4] = {0.1f, 0.1f, 0.1f, 1.0f};
 	float MatSpec[4]= {0.5,0.5,0.5,1.0f};
-	float MatShininess[]={1.f};
+	float MatShininess[]={128.f};
 
 	glMaterialfv(GL_FRONT,GL_SPECULAR,MatSpec);
 	glMaterialfv(GL_FRONT,GL_AMBIENT,MatAmb);
@@ -299,7 +299,7 @@ void Grid::generate_display_list(int x,int y, int z)
 			}
 			// triangle draw
 			float texture_position[2];
-			texture_block_get_position(texture_block_gravel,texture_position);
+			texture_block_get_position(texture_block_grass,texture_position);
 			{
 				glTexCoord2d(
 							texture_position[0]+triangle[0]*TEXT_X_INC2,
