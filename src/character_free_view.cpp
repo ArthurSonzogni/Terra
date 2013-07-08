@@ -27,7 +27,7 @@ void Character_free_view::mouse_click()
 	{
 		ray.decrement();
 		ray.get_current_position(&rayx,&rayy,&rayz);
-		grid->block_active(rayx,rayy,rayz,255,255,255);
+		grid->block_active(rayx,rayy,rayz,0);
 	}
 	else
 	{

@@ -20,13 +20,8 @@ class Grid
 		 
 		// grid information
 		int ***filled;
-		float ****color; 
-		float ***light_level;
-		float ***light_emission;
+		float ***texture; 
 		
-		
-		Color_manager color_manager;
-
 		
 		void initiate();
 		void free();
@@ -46,8 +41,8 @@ class Grid
 		Grid();
 		
 		void set_dimension(int Dimx, int Dimy, int Dimz);
-		void block_semi_active(int x, int y, int z, int r, int g, int b);
-		void block_active(int x, int y, int z, int r, int g, int b);
+		void block_semi_active(int x, int y, int z, int text);
+		void block_active(int x, int y, int z, int text);
 		void block_delete(int x, int y, int z);
 		void draw();
 		btBvhTriangleMeshShape* get_mesh();

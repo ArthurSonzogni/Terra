@@ -57,9 +57,7 @@ int main()
 	{
 		if (z_ok(x,y,z))
 			g.block_active(x,y,z,
-					Random(),
-					Random(),
-					Random()
+					texture_block_grass
 					);
 	}
 
@@ -69,9 +67,7 @@ int main()
 	for(int z=0;z<grid_dimz;++z)
 	{
 			g.block_semi_active(x,y,z,
-					Random(),
-					Random(),
-					Random()
+					texture_block_gravel
 					);
 	}
 
@@ -190,9 +186,9 @@ int main()
 		{
 			GLint location = glGetUniformLocation(program, "tex");
 	    	glUniform1i(location,0);
-			glActiveTexture(GL_TEXTURE0);
+			//glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
-			glBindSampler(0,0);
+			//glBindSampler(0,0);
 		}
 		for(int i=0;i<20;++i)
 		{

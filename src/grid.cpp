@@ -8,8 +8,7 @@ Grid::Grid():
 	dimz(0),
 	is_initiate(false),
 	filled(NULL),
-	color(NULL),
-	color_manager(),
+	texture(NULL),
 	display_list(0)
 {
 }
@@ -35,16 +34,16 @@ void Grid::free()
 		delete[] filled;
 
 
-		// free color
+		// free texture
 		for(int x=0;x<=1+dimx;++x)
 		{
 			for(int y=0;y<=1+dimy;++y)
 			{
-				delete[] color[x][y];
+				delete[] texture[x][y];
 			}
-			delete[] color[x];
+			delete[] texture[x];
 		}
-		delete[] color;
+		delete[] texture;
 	}
 }
 
@@ -68,17 +67,17 @@ void Grid::initiate()
 		}
 	}
 
-	// initiate color
-	color=new float***[dimx+2];
+	// initiate texture
+	texture=new float**[dimx+2];
 	for(int x=0;x<=1+dimx;++x)
 	{
-		color[x]=new float**[dimy+2];
+		texture[x]=new float*[dimy+2];
 		for(int y=0;y<=1+dimy;++y)
 		{
-			color[x][y]=new float*[dimz+2];
+			texture[x][y]=new float[dimz+2];
 			for(int z=0;z<=1+dimz;++z)
 			{
-				color[x][y][z]=NULL;
+				texture[x][y][z]=0;
 			}
 		}
 	}
@@ -119,11 +118,12 @@ void Grid::update(int x,int y,int z)
 }
 
 
-void Grid::block_semi_active(int xx, int yy, int zz, int r, int g, int b)
+void Grid::block_semi_active(int xx, int yy, int zz, int text)
 {
 	if (isPositionValid(xx,yy,zz))
 	{
-		color[xx][yy][zz]=color_manager.getColor(r,g,b);
+		if (filled[xx][yy][zz]==255) return;
+		texture[xx][yy][zz]=text;
 		
 		int n=0;
 		int x,y,z;
@@ -156,11 +156,11 @@ void Grid::block_semi_active(int xx, int yy, int zz, int r, int g, int b)
 			filled[xx][yy][zz]|=n;
 	}
 }
-void Grid::block_active(int x, int y, int z, int r, int g, int b)
+void Grid::block_active(int x, int y, int z, int text)
 {
 	if (isPositionValid(x,y,z))
 	{
-		color[x][y][z]=color_manager.getColor(r,g,b);
+		texture[x][y][z]=text;
 		filled[x][y][z]=255;
 		glDeleteLists(display_list,1);
 		display_list=0;
@@ -262,7 +262,7 @@ void Grid::generate_display_list(int x,int y, int z)
 		// change color model of the block
 		float MatDif[4] = {0.5f, 0.5f, 0.5f, 1.0f};
 
-		glMaterialfv(GL_FRONT,GL_DIFFUSE,color[x][y][z]);
+		//glMaterialfv(GL_FRONT,GL_DIFFUSE,color[x][y][z]);
 
 		for(j=0;j<semi_block_n_face[i];++j)
 		{
@@ -299,7 +299,7 @@ void Grid::generate_display_list(int x,int y, int z)
 			}
 			// triangle draw
 			float texture_position[2];
-			texture_block_get_position(texture_block_grass,texture_position);
+			texture_block_get_position(texture[x][y][z],texture_position);
 			{
 				glTexCoord2d(
 							texture_position[0]+triangle[0]*TEXT_X_INC2,

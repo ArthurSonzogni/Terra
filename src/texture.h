@@ -4,13 +4,12 @@
 #include <SFML/OpenGL.hpp>
 
 #define TEXT_BLOCK_SIZE (256.0)
-#define TEXT_BLOCK_SPACE (16.0)
 #define TEXT_X_N	(2)
 #define TEXT_Y_N	(1)
-#define TEXT_WIDTH ((TEXT_BLOCK_SIZE+TEXT_BLOCK_SPACE)*TEXT_X_N-TEXT_BLOCK_SPACE)
-#define TEXT_HEIGHT ((TEXT_BLOCK_SIZE+TEXT_BLOCK_SPACE)*TEXT_Y_N-TEXT_BLOCK_SPACE)
-#define TEXT_X_INC	((TEXT_BLOCK_SIZE+TEXT_BLOCK_SPACE)/TEXT_WIDTH)
-#define TEXT_Y_INC	((TEXT_BLOCK_SIZE+TEXT_BLOCK_SPACE)/TEXT_HEIGHT)
+#define TEXT_WIDTH (TEXT_BLOCK_SIZE*TEXT_X_N)
+#define TEXT_HEIGHT (TEXT_BLOCK_SIZE*TEXT_Y_N)
+#define TEXT_X_INC	(TEXT_BLOCK_SIZE/TEXT_WIDTH)
+#define TEXT_Y_INC	(TEXT_BLOCK_SIZE/TEXT_HEIGHT)
 #define TEXT_X_INC2	((TEXT_BLOCK_SIZE-1)/TEXT_WIDTH)
 #define TEXT_Y_INC2	((TEXT_BLOCK_SIZE-1)/TEXT_HEIGHT)
 
@@ -27,6 +26,7 @@ enum texture_block_identifiant
 	texture_block_gravel,
 	texture_block_enum_max
 };
+GLuint get_texture_block();
 
 GLuint get_texture_id(int i);
 void texture_block_get_position(int id, float* position);
