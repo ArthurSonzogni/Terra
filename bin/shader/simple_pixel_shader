@@ -1,5 +1,9 @@
-varying vec3 normal, lightDir, eyeVec;
+uniform sampler2DShadow shadowMap;
 uniform sampler2D tex;
+
+varying vec3 normal, lightDir, eyeVec;
+varying vec4 ShadowCoord;
+
 
 void main (void)
 {
@@ -11,6 +15,23 @@ void main (void)
 	vec3 L = normalize(lightDir);
 	
 	float lambertTerm = dot(N,L);
+
+	float biais1 = 0.001;
+	float biais2 = 0.003;
+	float visibility = 0.0;
+	visibility += 3.0*shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(+0.00,+0.00),(ShadowCoord.z-biais1)/ShadowCoord.w) ).r;
+	visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(0.003,0),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
+	visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(-0.003,0),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
+	visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(0,0.003),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
+	visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(0,-0.003),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
+	visibility += shadow2D( shadowMap,
+	vec3(ShadowCoord.xy+vec2(0.003,0.003),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
+	visibility += shadow2D( shadowMap,
+	vec3(ShadowCoord.xy+vec2(-0.003,-0.003),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
+	visibility += shadow2D( shadowMap,
+	vec3(ShadowCoord.xy+vec2(-0.003,0.003),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
+	visibility += shadow2D( shadowMap,
+	vec3(ShadowCoord.xy+vec2(0.003,-0.003),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
 	
 	if(lambertTerm > 0.0)
 	{
@@ -22,13 +43,17 @@ void main (void)
 		vec3 R = reflect(-L, N);
 		float specular = pow( max(dot(R, E), 0.0), 
 		                 gl_FrontMaterial.shininess );
+
 		final_color += gl_LightSource[0].specular * 
 		               gl_FrontMaterial.specular * 
 					   specular;	
 	}
-
+	final_color*=(0.3+visibility*0.1);
 	vec4 color = texture2D(tex,gl_TexCoord[0].xy);
 
-	gl_FragColor = final_color*color*vec4(2,2,2,2);			
-
+	gl_FragColor = color*final_color;
+	//gl_FragColor = color;
+	//gl_FragColor = texture2D(tex,ShadowCoord.xy);
+	//gl_FragColor=shadow2D(shadowMap,ShadowCoord.xyz);
+	
 }

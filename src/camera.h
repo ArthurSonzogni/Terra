@@ -5,6 +5,10 @@
 #define DEGTORAD 0.01745329252
 #include "ray.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 class Camera
 {
 	public:
@@ -19,7 +23,7 @@ class Camera
 		void angle_xz_change(float increment);
 		Ray get_ray();
 
-		void get_view();
+		glm::mat4 get_view();
 };
 
 #endif /* end of include guard: CAMERA_HUWKOK3I */

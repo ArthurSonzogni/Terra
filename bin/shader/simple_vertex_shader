@@ -1,16 +1,27 @@
-varying vec3 normal, lightDir, eyeVec;
+uniform mat4 camera_mat;
+uniform mat4 light_mat;
+uniform mat4 modelview_mat;
 uniform sampler2D tex;
+
+varying vec3 normal, lightDir, eyeVec;
+varying vec4 ShadowCoord;
+
+
 
 void main()
 {	
-	normal = gl_NormalMatrix * gl_Normal;
+	normal = vec3(modelview_mat * vec4(gl_Normal,0.0));
 
-	vec3 vVertex = vec3(gl_ModelViewMatrix * gl_Vertex);
+	vec3 vVertex = vec3(modelview_mat * gl_Vertex);
 
-	lightDir = vec3(gl_LightSource[0].position.xyz - vVertex);
+	vec3 light_position=vec3(-10,-10,20);
+	lightDir = vec3(light_position - vVertex);
 	eyeVec = -vVertex;
 
-	gl_Position = ftransform();		
+	vec4 vertex_after_modelview= modelview_mat * gl_Vertex;
 
+	gl_Position = camera_mat * vertex_after_modelview;
 	gl_TexCoord[0] = gl_MultiTexCoord0;
+	
+	ShadowCoord = light_mat * vertex_after_modelview;
 }

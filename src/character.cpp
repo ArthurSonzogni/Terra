@@ -17,7 +17,6 @@ void Character::mouse_click()
 }
 void Character::update_mouse_position(int x, int y)
 {
-	cout<<x<<"-----"<<y<<endl;
 }
 
 void Character::move_forward()
@@ -41,7 +40,14 @@ void Character::move_right()
 }
 
 
-void Character::get_view()
+glm::mat4 Character::get_view()
 {
-	camera.get_view();
+	return camera.get_view();
+};
+
+void Character::getPosition(int& x, int& y, int& z)
+{	
+	x=camera.x;
+	y=camera.y;
+	z=camera.z;
 }

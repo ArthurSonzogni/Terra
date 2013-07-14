@@ -23,7 +23,7 @@ void Character_free_view::mouse_click()
 		ray.increment();
 		ray.get_current_position(&rayx,&rayy,&rayz);
 	}
-	if (false)
+	if (true)
 	{
 		ray.decrement();
 		ray.get_current_position(&rayx,&rayy,&rayz);

@@ -1,0 +1,7 @@
+uniform mat4 light_mat;
+uniform mat4 modelview_mat;
+
+void main()
+{
+	gl_Position = light_mat * modelview_mat *gl_Vertex;
+}

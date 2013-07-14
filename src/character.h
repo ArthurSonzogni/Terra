@@ -22,7 +22,8 @@ class Character
 		virtual void move_left();
 		virtual void move_right(); 
 
-		void get_view();
+		glm::mat4 get_view();
+		void getPosition(int& x, int& y, int& z);
 };
 
 

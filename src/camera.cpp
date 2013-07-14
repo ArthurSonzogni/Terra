@@ -34,13 +34,24 @@ void Camera::angle_xz_change(float increment)
 	angle_xz+=increment;
 }
 
-void Camera::get_view()
+glm::mat4 Camera::get_view()
 {
-	glLoadIdentity();
-	gluLookAt(0,0,0,1,0,0,0,0,1);
+	float viewx,viewy,viewz;
+	viewx=cos(angle_xy)*cos(angle_xz);
+	viewy=sin(angle_xy)*cos(angle_xz);
+	viewz=sin(angle_xz);
+	gluLookAt(x,y,z,x+viewx,y+viewy,z+viewz,0,0,1);
+	return glm::lookAt(
+			glm::vec3(x,y,z),
+			glm::vec3(x+viewx,y+viewy,z+viewz),
+			glm::vec3(0,0,1)
+	);
+
+	/*
 	glRotatef(angle_xz*RADTODEG,0.f,1.f,0.f);
 	glRotatef(-angle_xy*RADTODEG,0.f,0.f,1.f);
 	glTranslatef(-x,-y,-z);
+	*/
 }
 
 Ray Camera::get_ray()

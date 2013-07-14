@@ -29,6 +29,8 @@ class Game_physic
 		// sphere related function
 		void add_sphere(int x, int y, int z);
 		void remove_sphere(int index);
+		void sphere_applyTorque(int index, float dx, float dy, float dz);
+		void sphere_applyImpulse(int index, float dx, float dy, float dz);
 		btTransform get_sphere_transformation(int index);
 
 		// world mesh function

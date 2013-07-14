@@ -9,6 +9,7 @@
 #include <SFML/System.hpp>
 #include "texture.h"
 #include "shader.h"
+#include "scene.h"
 
 
 using namespace sf;
@@ -19,17 +20,21 @@ int Random()
 	andom+=7;
 	andom*=13;
 	andom+=andom%10;
-	return  255+(andom%1);
+	return  andom%255;
 	//return 255+andom%255;
 }
 
 bool z_ok(int x,int y,int z)
 {
-	return z<11-10*cos(float(x)*0.1)*cos(float(y)*0.1);
+	//return z<3;
+	//return z<11-10*cos(float(x)*0.1)*cos(float(y)*0.1);
 	//return z<10-10*cos(float(x+y)*0.1)*cos(float(x-y)*0.1);
 	//return z<3+((x%2+x%5)%2 + (y%2+y%3)%2)%2;
 	//return z<4+3*sin(float(x*y)*0.01);;
 	//return z<30-abs(x-25)-abs(y-25);
+	//return z<((x%20)+(y%20))%20;
+	return z<4+((Random()%10)==0?Random()%2:0);
+	//return z<4;
 }
 
 int main()
@@ -41,8 +46,13 @@ int main()
 
 	// shader
 	Shader shader;
-	GLuint program=shader.loadProgram("shader/simple_vertex_shader","shader/simple_pixel_shader");
-	glUseProgram(program);
+	GLuint programShadow=shader.loadProgram("shader/shadow_vertex_shader","shader/shadow_pixel_shader");
+	GLuint programObject=shader.loadProgram("shader/simple_vertex_shader","shader/simple_pixel_shader");
+	
+	// scene
+	Scene scene;
+	scene.setShadowProgram(programShadow);
+	scene.setObjectProgram(programObject);
 
 	Grid g;
 	int grid_dimx=100;
@@ -67,8 +77,8 @@ int main()
 	for(int z=0;z<grid_dimz;++z)
 	{
 			g.block_semi_active(x,y,z,
-					texture_block_gravel
-					);
+					texture_block_grass
+			);
 	}
 
 	glEnable(GL_DEPTH_TEST);
@@ -88,10 +98,10 @@ int main()
 
 	glMatrixMode(GL_MODELVIEW);
 	 
-	float Light1Pos[4] = {25.f, 25.f, 1000.5, 1.0f};
-	float Light1Dif[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+	float Light1Pos[4] = {-100.0f, -100.0f, -200.0, 1.0f};
+	float Light1Dif[4] = {2.0f, 2.0f, 2.0f, 2.0f};
 	float Light1Spec[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-	float Light1Amb[4] = {0.1f, 0.1f, 0.1f, 1.0f};
+	float Light1Amb[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 
 	GLfloat  matShininess[]={1.0};
 	 
@@ -114,8 +124,9 @@ int main()
 	//character.camera.z=0;
 	
 	// Game_physic
+	int nb_sphere=2;
 	Game_physic gm;
-	for(int i=0;i<20;++i)
+	for(int i=0;i<nb_sphere;++i)
 	gm.add_sphere(20+2*i,20+2*i,25);
 	btBvhTriangleMeshShape* mesh;
 	mesh=g.get_mesh();
@@ -124,6 +135,7 @@ int main()
 
 	// texture
 	Texture_loader tl;	
+	
 
 
     // la boucle principale
@@ -155,8 +167,6 @@ int main()
 			}
         }
 
-        // effacement les tampons de couleur/profondeur
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		if (Keyboard::isKeyPressed(sf::Keyboard::Left))
 			character.move_left();
@@ -173,42 +183,90 @@ int main()
 		if (Mouse::isButtonPressed(Mouse::Left))
 			character.mouse_click();
 
+		if (Keyboard::isKeyPressed(sf::Keyboard::Space))
+		{
+			gm.sphere_applyTorque(0,3,0,0);
+		}
+
+		if (Keyboard::isKeyPressed(sf::Keyboard::C))
+		{
+			gm.sphere_applyImpulse(0,3,0,0);
+		}
+			
+
 
 		Vector2i position = sf::Mouse::getPosition(window);
 		character.update_mouse_position(position.x-400,-(position.y-300));
 		position.x=400;
 		position.y=300;
 		Mouse::setPosition(position,window);
-		character.get_view();
+		scene.setCameraMatrix(character.get_view());
 		glLightfv(GL_LIGHT0, GL_POSITION, Light1Pos);
-		g.draw();
 		
+		// drawing phase
+		for(int mode=BINDFORSHADOW;mode<=BINDFOROBJECT;++mode)
 		{
-			GLint location = glGetUniformLocation(program, "tex");
-	    	glUniform1i(location,0);
-			//glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
-			//glBindSampler(0,0);
-		}
-		for(int i=0;i<20;++i)
-		{
-			btTransform tr=gm.get_sphere_transformation(i);
-			GLUquadricObj *quadric=gluNewQuadric();
-			gluQuadricNormals(quadric, GLU_SMOOTH);
-			gluQuadricTexture(quadric, GL_TRUE);
-			btScalar m[16];
-			glPushMatrix();
-			tr.getOpenGLMatrix(m);
-			glMultMatrixf((GLfloat*)m);
-			gluSphere(quadric, 1.0f,20,20);
-			glPopMatrix();
-			gluDeleteQuadric(quadric);
+			if (mode==BINDFORSHADOW)
+			{
+				int cx,cy,cz;
+				character.getPosition(cx,cy,cz);
+				scene.setCameraPosition(cx,cy,cz);
+			}
+
+			scene.bindFor(mode);
+			
+
+
+			g.draw();
+			
+			{
+				GLint location = glGetUniformLocation(programObject, "tex");
+				glUniform1i(location,0);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
+				//glBindSampler(0,0);
+			}
+			for(int i=0;i<nb_sphere;++i)
+			{
+				// get transformation we need to apply on the sphere
+				btTransform tr=gm.get_sphere_transformation(i);
+				btScalar m[16];
+				tr.getOpenGLMatrix(m);
+				glm::mat4 mat=glm::mat4(
+						m[0],
+						m[1],
+						m[2],
+						m[3],
+						m[4],
+						m[5],
+						m[6],
+						m[7],
+						m[8],
+						m[9],
+						m[10],
+						m[11],
+						m[12],
+						m[13],
+						m[14],
+						m[15]
+				);
+				scene.pushModelViewMatrix();
+				scene.multModelViewMatrix(mat);
+				scene.sendModelViewMatrix();
+				scene.popModelViewMatrix();
+				// drawing the sphere
+				GLUquadricObj *quadric=gluNewQuadric();
+				gluQuadricNormals(quadric, GLU_SMOOTH);
+				gluQuadricTexture(quadric, GL_TRUE);
+				gluSphere(quadric, 1.0f,20,20);
+				gluDeleteQuadric(quadric);
+			}
 		}
 		gm.stepSimulation(1.0/30.0);
 		window.display();
 
 		double time_elapsed=c.getElapsedTime().asSeconds();;
-		cout<<(time_elapsed*30.0)<<endl;
+		//cout<<(time_elapsed*30.0)<<endl;
 		sf::sleep(sf::seconds(1./30.-time_elapsed));
     }
 

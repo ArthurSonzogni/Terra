@@ -179,11 +179,7 @@ void Grid::block_delete(int x, int y, int z)
 void Grid::draw()
 {
 	if (display_list==0)
-	{
-		glPushMatrix();
 		generate_display_list();
-		glPopMatrix();
-	}
 
 	glCallList(display_list);
 }
@@ -196,8 +192,8 @@ void Grid::generate_display_list()
 		glDeleteLists(display_list,1);
 	
 	// change color model of the block
-	float MatDif[4] = {0.6f, 0.6f, 0.6f, 1.0f};
-	float MatAmb[4] = {0.1f, 0.1f, 0.1f, 1.0f};
+	float MatDif[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+	float MatAmb[4] = {0.3f, 0.3f, 0.3f, 1.0f};
 	float MatSpec[4]= {0.5,0.5,0.5,1.0f};
 	float MatShininess[]={128.f};
 
@@ -208,15 +204,14 @@ void Grid::generate_display_list()
 	display_list=glGenLists(1);
 	glLoadIdentity();
 	glNewList(display_list,GL_COMPILE);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_block));
-	glPushMatrix();
 	glBegin(GL_TRIANGLES);
 	for(x=1;x<=dimx;++x)
 	for(y=1;y<=dimy;++y)
 	for(z=1;z<=dimz;++z)
 		generate_display_list(x,y,z);
 	glEnd();
-	glPopMatrix();
 	glEndList();;
 	
 }
