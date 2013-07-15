@@ -23,6 +23,7 @@ class Scene
 		GLuint shadow_framebuffer;
 		GLuint shadowMap_id;
 		GLuint camera_matrix_id;
+		GLuint camera_matrix_without_projection_id;
 		GLuint light_matrix_on_object_id;
 		GLuint light_matrix_on_shadow_id;
 		GLuint modelview_on_object_id;

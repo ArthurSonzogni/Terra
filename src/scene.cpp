@@ -111,6 +111,11 @@ void Scene::bindForObject()
 	glUniformMatrix4fv(camera_matrix_id,
 			1,GL_FALSE,&(projection_matrix[0][0]));
 
+	// sending information for camera matrix
+	projection_matrix=camera_matrix;
+	glUniformMatrix4fv(camera_matrix_without_projection_id,
+			1,GL_FALSE,&(projection_matrix[0][0]));
+
 	// sending information for the modelview
 	glUniformMatrix4fv(modelview_on_object_id,
 			1,GL_FALSE,&(modelview_matrix[0][0]));
@@ -141,6 +146,7 @@ void Scene::setObjectProgram(GLuint program)
 	// getting id
 	shadowMap_id=glGetUniformLocation(program,"shadowMap");
 	camera_matrix_id=glGetUniformLocation(program,"camera_mat");
+	camera_matrix_without_projection_id=glGetUniformLocation(program,"camera_mat_without_projection");
 	light_matrix_on_object_id=glGetUniformLocation(program,"light_mat");
 	modelview_on_object_id=glGetUniformLocation(program,"modelview_mat");
 }

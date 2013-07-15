@@ -7,14 +7,10 @@ varying vec4 ShadowCoord;
 
 void main (void)
 {
-	vec4 final_color = 
+	vec4 ambient_color = 
 	(gl_FrontLightModelProduct.sceneColor * gl_FrontMaterial.ambient) + 
 	(gl_LightSource[0].ambient * gl_FrontMaterial.ambient);
 							
-	vec3 N = normalize(normal);
-	vec3 L = normalize(lightDir);
-	
-	float lambertTerm = dot(N,L);
 
 	float biais1 = 0.001;
 	float biais2 = 0.003;
@@ -32,10 +28,16 @@ void main (void)
 	vec3(ShadowCoord.xy+vec2(-0.003,0.003),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
 	visibility += shadow2D( shadowMap,
 	vec3(ShadowCoord.xy+vec2(0.003,-0.003),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
+
+	vec3 N = normalize(normal);
+	vec3 L = normalize(lightDir);
 	
+	float lambertTerm = dot(N,L);
+
+	vec4 light_added_color=vec4(0.0,0.0,0.0,0.0);
 	if(lambertTerm > 0.0)
 	{
-		final_color += gl_LightSource[0].diffuse * 
+		light_added_color += gl_LightSource[0].diffuse * 
 		               gl_FrontMaterial.diffuse * 
 					   lambertTerm;	
 		
@@ -44,14 +46,14 @@ void main (void)
 		float specular = pow( max(dot(R, E), 0.0), 
 		                 gl_FrontMaterial.shininess );
 
-		final_color += gl_LightSource[0].specular * 
+		light_added_color +=  10.0*gl_LightSource[0].specular * 
 		               gl_FrontMaterial.specular * 
 					   specular;	
 	}
-	final_color*=(0.3+visibility*0.1);
+	light_added_color*=visibility*0.11;
 	vec4 color = texture2D(tex,gl_TexCoord[0].xy);
 
-	gl_FragColor = color*final_color;
+	gl_FragColor = color*(ambient_color+light_added_color);
 	//gl_FragColor = color;
 	//gl_FragColor = texture2D(tex,ShadowCoord.xy);
 	//gl_FragColor=shadow2D(shadowMap,ShadowCoord.xyz);
