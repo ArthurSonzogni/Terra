@@ -33,8 +33,8 @@ bool z_ok(int x,int y,int z)
 	//return z<4+3*sin(float(x*y)*0.01);;
 	//return z<30-abs(x-25)-abs(y-25);
 	//return z<((x%20)+(y%20))%20;
-	return z<4+((Random()%10)==0?Random()%2:0);
-	//return z<4;
+	//return z<4+((Random()%10)==0?Random()%2:0);
+	return z<4;
 }
 
 int main()
@@ -55,8 +55,8 @@ int main()
 	scene.setObjectProgram(programObject);
 
 	Grid g;
-	int grid_dimx=100;
-	int grid_dimy=100;
+	int grid_dimx=50;
+	int grid_dimy=50;
 	int grid_dimz=21;
 	g.set_dimension(grid_dimx,grid_dimy,grid_dimz);
 	
@@ -181,17 +181,20 @@ int main()
 			character.move_backward();
 	
 		if (Mouse::isButtonPressed(Mouse::Left))
+		{
 			character.mouse_click();
-
-		if (Keyboard::isKeyPressed(sf::Keyboard::Space))
-		{
-			gm.sphere_applyTorque(0,3,0,0);
+			mesh=g.get_mesh();
+			gm.set_world_mesh(mesh);
 		}
 
-		if (Keyboard::isKeyPressed(sf::Keyboard::C))
-		{
-			gm.sphere_applyImpulse(0,3,0,0);
-		}
+		if (Keyboard::isKeyPressed(sf::Keyboard::Z))
+			gm.sphere_applyTorque(0,0,1.2,0);
+		if (Keyboard::isKeyPressed(sf::Keyboard::Q))
+			gm.sphere_applyTorque(0,-1.2,0,0);
+		if (Keyboard::isKeyPressed(sf::Keyboard::S))
+			gm.sphere_applyTorque(0,0,-1.2,0);
+		if (Keyboard::isKeyPressed(sf::Keyboard::D))
+			gm.sphere_applyTorque(0,1.2,0,0);
 			
 
 
@@ -262,11 +265,13 @@ int main()
 				gluDeleteQuadric(quadric);
 			}
 		}
-		gm.stepSimulation(1.0/30.0);
-		window.display();
+
+
 
 		double time_elapsed=c.getElapsedTime().asSeconds();;
-		//cout<<(time_elapsed*30.0)<<endl;
+		cout<<(time_elapsed*30.0)<<endl;
+		gm.stepSimulation(1.0/30.0);
+		window.display();
 		sf::sleep(sf::seconds(1./30.-time_elapsed));
     }
 

@@ -1,4 +1,6 @@
 #include "game_physic.h"
+#include <iostream>
+using namespace std;
 
 Game_physic::Game_physic()
 {
@@ -13,6 +15,7 @@ Game_physic::Game_physic()
 			solver,
 			collisionConfiguration);
 	dynamicsWorld->setGravity(btVector3(0,0,-10));
+	world_body=NULL;
 	world_mesh=NULL;
 }
 
@@ -24,6 +27,9 @@ Game_physic::~Game_physic()
 	{
 		remove_sphere(i);
 	}
+
+	// delete world mesh;
+	delete_world_mesh();
 
 	// delete bullet physic element
 	delete dynamicsWorld;
@@ -52,7 +58,11 @@ void Game_physic::add_sphere(int x, int y, int z)
 			inertia);
 	btRigidBody* rigidBody = new btRigidBody(rigidBodyCI);
 	rigidBody->setRollingFriction(0.1);
-	//rigidBody->setDamping(0,1);
+	rigidBody->setDamping(0.01,0.1);
+	rigidBody->setRestitution(0.2);
+	rigidBody->setFriction(7.0);
+	rigidBody->setAngularFactor(1.0);
+	rigidBody->forceActivationState(DISABLE_DEACTIVATION);
 	dynamicsWorld->addRigidBody(rigidBody);
 	
 	sphere.push_back(rigidBody);
@@ -65,6 +75,7 @@ void Game_physic::remove_sphere(int index)
 	{
 		dynamicsWorld->removeRigidBody(rigidBody);
 		delete rigidBody->getMotionState();
+		delete rigidBody->getCollisionShape();
 		delete rigidBody;
 		sphere[index]=NULL;
 	}
@@ -79,23 +90,29 @@ btTransform Game_physic::get_sphere_transformation(int index)
 
 void Game_physic::stepSimulation(float time)
 {
-	dynamicsWorld->stepSimulation(time,2);
+	dynamicsWorld->stepSimulation(time,30);
 	//sphere[0]->applyCentralForce(btVector3(5,0,0));
 	//sphere[0]->applyTorqueImpulse(btVector3(0.1,0,0));
 }
 
 void Game_physic::delete_world_mesh()
 {
-	if (world_mesh!=NULL)
+	cout<<"je delete world_mesh"<<endl;
+	if (world_body)
 	{
-		delete world_mesh;	
+		dynamicsWorld->removeRigidBody(world_body);
+		delete world_body->getMotionState();
+		delete world_body;
+		delete world_mesh;
+		world_body=NULL;
 		world_mesh=NULL;
 	}
 }
 
 void Game_physic::set_world_mesh(btBvhTriangleMeshShape* mesh)
 {
-	if (world_mesh) delete_world_mesh();
+	delete_world_mesh();
+
 	world_mesh=mesh;
 	btDefaultMotionState* motionState = new btDefaultMotionState(
 													btTransform(
@@ -108,11 +125,14 @@ void Game_physic::set_world_mesh(btBvhTriangleMeshShape* mesh)
 	btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(
 			mass,
 			motionState,
-			world_mesh,
+			mesh,
 			inertia);
-	btRigidBody* rigidBody = new btRigidBody(rigidBodyCI);
-	dynamicsWorld->addRigidBody(rigidBody);
-	
+	btRigidBody* world_body = new btRigidBody(rigidBodyCI);
+	world_body->setRollingFriction(0.1);
+	world_body->setFriction(7.0);
+	world_body->setRestitution(0.2);
+	world_body->setAngularFactor(1.0);
+	dynamicsWorld->addRigidBody(world_body);
 }
 
 void Game_physic::sphere_applyTorque(int index, float dx, float dy, float dz)

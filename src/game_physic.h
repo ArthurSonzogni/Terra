@@ -20,6 +20,7 @@ class Game_physic
 		
 		vector<btRigidBody*> sphere;
 		
+		btRigidBody* world_body;
 		btBvhTriangleMeshShape* world_mesh;
 		void delete_world_mesh();
 	public:
