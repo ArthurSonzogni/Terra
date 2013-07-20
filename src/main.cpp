@@ -11,6 +11,8 @@
 #include "shader.h"
 #include "scene.h"
 
+#include "game_editor.h"
+
 
 using namespace sf;
 
@@ -49,6 +51,38 @@ int main()
 	GLuint programShadow=shader.loadProgram("shader/shadow_vertex_shader","shader/shadow_pixel_shader");
 	GLuint programObject=shader.loadProgram("shader/simple_vertex_shader","shader/simple_pixel_shader");
 	
+	// opengl initialisation
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+
+	glEnable(GL_NORMALIZE);
+	glShadeModel(GL_SMOOTH);
+
+	float Light1Dif[4] = {2.0f, 2.0f, 2.0f, 2.0f};
+	float Light1Spec[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+	float Light1Amb[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+
+	GLfloat  matShininess[]={1.0};
+	glLightfv(GL_LIGHT0, GL_SPECULAR, Light1Spec);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, Light1Dif);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, Light1Amb);
+
+	// texture loading
+	Texture_loader tl;	
+	
+
+	// game editor
+	Game_editor game_editor;
+	game_editor.levelLoadEmpty();
+	game_editor.setWindow(&window);
+	game_editor.setProgram(programShadow,programShadow);
+	//game_editor.process();
+
+	//*
 	// scene
 	Scene scene;
 	scene.setShadowProgram(programShadow);
@@ -81,38 +115,10 @@ int main()
 			);
 	}
 
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
+
+	 
+	 
 	
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-
-	glEnable(GL_NORMALIZE);
-	glShadeModel(GL_SMOOTH);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(70.f, 1.f, 0.01f, 500.f);
-	//glOrtho(-1,1,-1,1,-100,100);
-
-	glMatrixMode(GL_MODELVIEW);
-	 
-	float Light1Pos[4] = {-100.0f, -100.0f, -200.0, 1.0f};
-	float Light1Dif[4] = {2.0f, 2.0f, 2.0f, 2.0f};
-	float Light1Spec[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-	float Light1Amb[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-
-	GLfloat  matShininess[]={1.0};
-	 
-	 
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, Light1Dif); 	//Et ceux de la lumière
-	glLightfv(GL_LIGHT0, GL_SPECULAR, Light1Spec);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, Light1Amb);
-
-
-	float Light1Dir[3] = {-1.0f, -1.0f, -1.0f};
-	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Light1Dir);
 
 	// Character creation
 	Character_free_view character;
@@ -133,8 +139,6 @@ int main()
 	gm.set_world_mesh(mesh);
 		
 
-	// texture
-	Texture_loader tl;	
 	
 
 
@@ -204,7 +208,6 @@ int main()
 		position.y=300;
 		Mouse::setPosition(position,window);
 		scene.setCameraMatrix(character.get_view());
-		glLightfv(GL_LIGHT0, GL_POSITION, Light1Pos);
 		
 		// drawing phase
 		for(int mode=BINDFORSHADOW;mode<=BINDFOROBJECT;++mode)
@@ -274,6 +277,8 @@ int main()
 		window.display();
 		sf::sleep(sf::seconds(1./30.-time_elapsed));
     }
+
+	//*/
 
 	return 0;
 }

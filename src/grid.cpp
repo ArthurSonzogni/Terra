@@ -181,6 +181,7 @@ void Grid::draw()
 	if (display_list==0)
 		generate_display_list();
 
+
 	glCallList(display_list);
 }
 

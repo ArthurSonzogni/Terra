@@ -14,7 +14,7 @@ Game_physic::Game_physic()
 			broadphase,
 			solver,
 			collisionConfiguration);
-	dynamicsWorld->setGravity(btVector3(0,0,-10));
+	dynamicsWorld->setGravity(btVector3(0,0,-16));
 	world_body=NULL;
 	world_mesh=NULL;
 }
@@ -58,9 +58,9 @@ void Game_physic::add_sphere(int x, int y, int z)
 			inertia);
 	btRigidBody* rigidBody = new btRigidBody(rigidBodyCI);
 	rigidBody->setRollingFriction(0.1);
-	rigidBody->setDamping(0.01,0.1);
+	rigidBody->setDamping(0.1,0.1);
 	rigidBody->setRestitution(0.2);
-	rigidBody->setFriction(7.0);
+	rigidBody->setFriction(2.0);
 	rigidBody->setAngularFactor(1.0);
 	rigidBody->forceActivationState(DISABLE_DEACTIVATION);
 	dynamicsWorld->addRigidBody(rigidBody);
@@ -129,7 +129,7 @@ void Game_physic::set_world_mesh(btBvhTriangleMeshShape* mesh)
 			inertia);
 	btRigidBody* world_body = new btRigidBody(rigidBodyCI);
 	world_body->setRollingFriction(0.1);
-	world_body->setFriction(7.0);
+	world_body->setFriction(2.0);
 	world_body->setRestitution(0.2);
 	world_body->setAngularFactor(1.0);
 	dynamicsWorld->addRigidBody(world_body);
