@@ -82,6 +82,7 @@ Texture_loader::Texture_loader()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 5);
 		texture_id[i]=texture;
+		glBindTexture(GL_TEXTURE_2D,GL_NONE);
 	}
 }
 
@@ -94,7 +95,7 @@ Texture_loader::~Texture_loader()
 	}
 }
 
-
+// TODO memorisation for optimisation
 void texture_block_get_position(int id, float* position)
 {
 	position[0]=float(id%TEXT_X_N)*TEXT_X_INC;

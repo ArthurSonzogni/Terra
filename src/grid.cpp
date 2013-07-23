@@ -203,27 +203,18 @@ void Grid::generate_display_list()
 	glMaterialfv(GL_FRONT,GL_SHININESS,MatShininess);
 	
 	display_list=glGenLists(1);
-	glLoadIdentity();
 	glNewList(display_list,GL_COMPILE);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_block));
 	glBegin(GL_TRIANGLES);
-	for(x=1;x<=dimx;++x)
-	for(y=1;y<=dimy;++y)
-	for(z=1;z<=dimz;++z)
-		generate_display_list(x,y,z);
+		for(x=1;x<=dimx;++x)
+		for(y=1;y<=dimy;++y)
+		for(z=1;z<=dimz;++z)
+			generate_display_list(x,y,z);
 	glEnd();
 	glEndList();;
 	
 }
-
-float Color[9]=
-{
-	1.0,0.0,0.0,
-	1.0,0.0,1.0,
-	1.0,0.0,0.1,
-};
-
 
 inline void triangle_get_normal(float t[9],float* x,float* y,float* z)
 {
@@ -274,9 +265,6 @@ void Grid::generate_display_list(int x,int y, int z)
 				continue;
 
 
-			c=(c+3)%7;
-			//glColor3f(Color[c],Color[c+1],Color[c+2]);
-				
 			
 			float triangle[9];
 			for(k=0;k<3;k++)

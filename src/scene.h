@@ -21,6 +21,7 @@ class Scene
 		GLuint program_shadow;
 		GLuint program_object;
 		GLuint shadow_framebuffer;
+		GLuint shadow_depthTexture;
 		GLuint shadowMap_id;
 		GLuint camera_matrix_id;
 		GLuint camera_matrix_without_projection_id;

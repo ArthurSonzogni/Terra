@@ -46,11 +46,15 @@ int main()
     sf::Window window(sf::VideoMode(800, 600), "OpenGL", sf::Style::Default, sf::ContextSettings(32));
     window.setVerticalSyncEnabled(true);
 
+	// texture loading
+	Texture_loader tl;	
+
+
 	// shader
 	Shader shader;
 	GLuint programShadow=shader.loadProgram("shader/shadow_vertex_shader","shader/shadow_pixel_shader");
 	GLuint programObject=shader.loadProgram("shader/simple_vertex_shader","shader/simple_pixel_shader");
-	
+
 	// opengl initialisation
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -62,31 +66,39 @@ int main()
 	glEnable(GL_NORMALIZE);
 	glShadeModel(GL_SMOOTH);
 
+	
+	float Light1Pos[4] = {-100.0f, -100.0f, -200, 1.0f};
 	float Light1Dif[4] = {2.0f, 2.0f, 2.0f, 2.0f};
 	float Light1Spec[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 	float Light1Amb[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 
 	GLfloat  matShininess[]={1.0};
-	glLightfv(GL_LIGHT0, GL_SPECULAR, Light1Spec);
+
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, Light1Dif);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, Light1Spec);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, Light1Amb);
 
-	// texture loading
-	Texture_loader tl;	
+	float Light1Dir[3] = {-1.0f, -1.0f, -1.0f};
+	glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,Light1Dir);
+	
 	
 
 	// game editor
 	Game_editor game_editor;
 	game_editor.levelLoadEmpty();
 	game_editor.setWindow(&window);
-	game_editor.setProgram(programShadow,programShadow);
-	//game_editor.process();
+	game_editor.setProgram(programShadow,programObject);
+	game_editor.process();
+
+
 
 	//*
 	// scene
 	Scene scene;
 	scene.setShadowProgram(programShadow);
 	scene.setObjectProgram(programObject);
+
+
 
 	Grid g;
 	int grid_dimx=50;
@@ -116,10 +128,6 @@ int main()
 	}
 
 
-	 
-	 
-	
-
 	// Character creation
 	Character_free_view character;
 	character.set_grid(&g);
@@ -127,7 +135,6 @@ int main()
 	position.x=400;
 	position.y=300;
 	Mouse::setPosition(position,window);
-	//character.camera.z=0;
 	
 	// Game_physic
 	int nb_sphere=2;
@@ -138,8 +145,6 @@ int main()
 	mesh=g.get_mesh();
 	gm.set_world_mesh(mesh);
 		
-
-	
 
 
     // la boucle principale
@@ -208,6 +213,7 @@ int main()
 		position.y=300;
 		Mouse::setPosition(position,window);
 		scene.setCameraMatrix(character.get_view());
+		glLightfv(GL_LIGHT0,GL_POSITION,Light1Pos);
 		
 		// drawing phase
 		for(int mode=BINDFORSHADOW;mode<=BINDFOROBJECT;++mode)
@@ -221,6 +227,9 @@ int main()
 
 			scene.bindFor(mode);
 			
+			GLint location = glGetUniformLocation(programObject, "tex");
+			glUniform1i(location,0);
+			glActiveTexture(GL_TEXTURE0);
 
 
 			g.draw();

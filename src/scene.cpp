@@ -18,9 +18,8 @@ Scene::Scene():
 	glBindFramebuffer(GL_FRAMEBUFFER, shadow_framebuffer);
 
 	// Depth texture. Slower than a depth buffer, but you can sample it later in your shader
-	GLuint depthTexture;
-	glGenTextures(1, &depthTexture);
-	glBindTexture(GL_TEXTURE_2D, depthTexture);
+	glGenTextures(1, &shadow_depthTexture);
+	glBindTexture(GL_TEXTURE_2D, shadow_depthTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT32, 1024, 1024, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -29,10 +28,11 @@ Scene::Scene():
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,depthTexture, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,shadow_depthTexture, 0);
 
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
+	
 
 	// Always check that our framebuffer is ok
 	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -62,7 +62,8 @@ Scene::Scene():
 
 Scene::~Scene()
 {
-
+	glDeleteFramebuffers(1,&shadow_framebuffer);
+	glDeleteTextures(1,&shadow_depthTexture);
 }
 
 void Scene::bindForShadow()
@@ -96,7 +97,6 @@ void Scene::bindForObject()
 	modelview_matrix=glm::mat4(1.0);
 
 	glViewport(0,0,800,600);
-	cout<<shadowMap_id<<" "<<camera_matrix_id<<" "<<light_matrix_on_object_id<<" "<<light_matrix_on_shadow_id<<" "<<modelview_on_shadow_id<<" "<<modelview_on_object_id<<endl;
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(program_object);
@@ -122,7 +122,7 @@ void Scene::bindForObject()
 
 	// sending the buffer storing the shadow
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D,shadow_framebuffer);
+	glBindTexture(GL_TEXTURE_2D,shadow_depthTexture);
 	glUniform1i(shadowMap_id,1);
 
 
