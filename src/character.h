@@ -16,6 +16,7 @@ class Character
 		Character();
 		void set_grid(Grid* grid);
 		virtual void mouse_click();
+		virtual void step();
 		virtual void update_mouse_position(int x, int y);
 		virtual void move_forward();
 		virtual void move_backward();

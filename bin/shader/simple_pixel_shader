@@ -50,10 +50,11 @@ void main (void)
 		               gl_FrontMaterial.specular * 
 					   specular;	
 	}
-	light_added_color*=visibility*0.11;
+	light_added_color*=visibility*0.09;
 	vec4 color = texture2D(tex,gl_TexCoord[0].xy);
 
 	gl_FragColor = color*(ambient_color+light_added_color);
+	gl_FragColor.a=0.6;
 	//gl_FragColor = color;
 	//gl_FragColor = texture2D(tex,ShadowCoord.xy);
 	//gl_FragColor=shadow2D(shadowMap,ShadowCoord.xyz);

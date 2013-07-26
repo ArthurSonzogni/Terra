@@ -32,6 +32,8 @@ void Camera::angle_xy_change(float increment)
 void Camera::angle_xz_change(float increment)
 {
 	angle_xz+=increment;
+	if (angle_xz<-1.56) angle_xz=-1.56;
+	if (angle_xz>+1.56) angle_xz=+1.56;
 }
 
 glm::mat4 Camera::get_view()

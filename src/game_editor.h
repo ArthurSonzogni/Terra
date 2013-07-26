@@ -8,8 +8,8 @@
 #include "grid.h"
 #include "character_free_view.h"
 #include "scene.h"
+#include "game_editor_menu.h"
 
-using namespace sf;
 
 enum game_editor_state
 {
@@ -42,7 +42,7 @@ class Game_editor
 		//----- Scene initilisation function ----//
 		void setProgram(GLuint shadowProgram, GLuint objectProgram);
 		
-		void setWindow(Window* w);
+		void setScreen(sf::RenderWindow* w);
 		
 
 	private:
@@ -50,6 +50,7 @@ class Game_editor
 		Character_free_view character;
 		Grid* grid;
 		Scene scene;
+		Game_editor_menu game_editor_menu;
 
 		int state;
 
@@ -57,7 +58,7 @@ class Game_editor
 		GLuint objectProgram;
 		GLuint shadowProgram;
 		
-		Window* window;
+		sf::RenderWindow* window;
 
 		
 		//----- Helper member function -------//

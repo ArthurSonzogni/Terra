@@ -99,9 +99,9 @@ Texture_loader::~Texture_loader()
 void texture_block_get_position(int id, float* position)
 {
 	position[0]=float(id%TEXT_X_N)*TEXT_X_INC;
-	position[1]=float(id%TEXT_Y_N)*TEXT_Y_INC;
+	position[1]=float(id/TEXT_X_N)*TEXT_Y_INC;
 
 	// correction
-	position[0]+=0.5/TEXT_BLOCK_SIZE;
-	position[1]+=0.5/TEXT_BLOCK_SIZE;
+	//position[0]+=0.5/TEXT_BLOCK_SIZE;
+	//position[1]+=0.5/TEXT_BLOCK_SIZE;
 }

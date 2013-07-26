@@ -7,14 +7,13 @@
 #include <cmath>
 #include "game_physic.h"
 #include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
 #include "texture.h"
 #include "shader.h"
 #include "scene.h"
 
 #include "game_editor.h"
 
-
-using namespace sf;
 
 int andom=3;
 int Random()
@@ -43,12 +42,11 @@ int main()
 {
 
     // crée la fenêtre
-    sf::Window window(sf::VideoMode(800, 600), "OpenGL", sf::Style::Default, sf::ContextSettings(32));
+    sf::RenderWindow window(sf::VideoMode(800, 600), "OpenGL", sf::Style::Default, sf::ContextSettings(32));
     window.setVerticalSyncEnabled(true);
 
 	// texture loading
 	Texture_loader tl;	
-
 
 	// shader
 	Shader shader;
@@ -86,7 +84,7 @@ int main()
 	// game editor
 	Game_editor game_editor;
 	game_editor.levelLoadEmpty();
-	game_editor.setWindow(&window);
+	game_editor.setScreen(&window);
 	game_editor.setProgram(programShadow,programObject);
 	game_editor.process();
 
@@ -131,10 +129,10 @@ int main()
 	// Character creation
 	Character_free_view character;
 	character.set_grid(&g);
-	Vector2i position;
+	sf::Vector2i position;
 	position.x=400;
 	position.y=300;
-	Mouse::setPosition(position,window);
+	sf::Mouse::setPosition(position,window);
 	
 	// Game_physic
 	int nb_sphere=2;
@@ -149,7 +147,7 @@ int main()
 
     // la boucle principale
     bool running = true;
-	Clock c;
+	sf::Clock c;
     while (running)
     {
 		c.restart();
@@ -177,41 +175,41 @@ int main()
         }
 
 
-		if (Keyboard::isKeyPressed(sf::Keyboard::Left))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 			character.move_left();
 
-		if (Keyboard::isKeyPressed(sf::Keyboard::Right))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 			character.move_right();
 
-		if (Keyboard::isKeyPressed(sf::Keyboard::Up))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 			character.move_forward();
 
-		if (Keyboard::isKeyPressed(sf::Keyboard::Down))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 			character.move_backward();
 	
-		if (Mouse::isButtonPressed(Mouse::Left))
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
 			character.mouse_click();
 			mesh=g.get_mesh();
 			gm.set_world_mesh(mesh);
 		}
 
-		if (Keyboard::isKeyPressed(sf::Keyboard::Z))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
 			gm.sphere_applyTorque(0,0,1.2,0);
-		if (Keyboard::isKeyPressed(sf::Keyboard::Q))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 			gm.sphere_applyTorque(0,-1.2,0,0);
-		if (Keyboard::isKeyPressed(sf::Keyboard::S))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 			gm.sphere_applyTorque(0,0,-1.2,0);
-		if (Keyboard::isKeyPressed(sf::Keyboard::D))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 			gm.sphere_applyTorque(0,1.2,0,0);
 			
 
 
-		Vector2i position = sf::Mouse::getPosition(window);
+		sf::Vector2i position = sf::Mouse::getPosition(window);
 		character.update_mouse_position(position.x-400,-(position.y-300));
 		position.x=400;
 		position.y=300;
-		Mouse::setPosition(position,window);
+		sf::Mouse::setPosition(position,window);
 		scene.setCameraMatrix(character.get_view());
 		glLightfv(GL_LIGHT0,GL_POSITION,Light1Pos);
 		

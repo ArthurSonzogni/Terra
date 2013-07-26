@@ -51,3 +51,8 @@ void Character::getPosition(int& x, int& y, int& z)
 	y=camera.y;
 	z=camera.z;
 }
+
+void Character::step()
+{
+
+}

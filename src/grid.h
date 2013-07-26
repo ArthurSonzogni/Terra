@@ -20,7 +20,7 @@ class Grid
 		 
 		// grid information
 		int ***filled;
-		float ***texture; 
+		int ***texture; 
 		
 		
 		void initiate();
@@ -36,7 +36,16 @@ class Grid
 		void generate_display_list();
 		void generate_display_list(int x,int y, int z);
 		void block_get_mesh(btTriangleMesh* m,int x,int y,int z);
+		
 
+		int  ghost_block_enable;
+		bool ghost_block_semi;
+		int  ghost_block_x;
+		int  ghost_block_y;
+		int  ghost_block_z;
+		int  ghost_block_tex;
+		void draw_block_ghost_helper();
+		
 	public:
 		Grid();
 		
@@ -50,6 +59,8 @@ class Grid
 		int get_filled(int x, int y, int z);
 		
 		~Grid();
+		
+		void draw_block_ghost(bool semi, int x, int y, int z, int tex);
 };
 
 

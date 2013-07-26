@@ -4,8 +4,8 @@
 #include <SFML/OpenGL.hpp>
 
 #define TEXT_BLOCK_SIZE (256.0)
-#define TEXT_X_N	(2)
-#define TEXT_Y_N	(1)
+#define TEXT_X_N	(4)
+#define TEXT_Y_N	(4)
 #define TEXT_WIDTH (TEXT_BLOCK_SIZE*TEXT_X_N)
 #define TEXT_HEIGHT (TEXT_BLOCK_SIZE*TEXT_Y_N)
 #define TEXT_X_INC	(TEXT_BLOCK_SIZE/TEXT_WIDTH)
@@ -24,6 +24,8 @@ enum texture_block_identifiant
 {
 	texture_block_grass,
 	texture_block_gravel,
+	texture_block_ghost,
+	texture_block_rock,
 	texture_block_enum_max
 };
 GLuint get_texture_block();

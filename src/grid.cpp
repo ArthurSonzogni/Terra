@@ -68,13 +68,13 @@ void Grid::initiate()
 	}
 
 	// initiate texture
-	texture=new float**[dimx+2];
+	texture=new int**[dimx+2];
 	for(int x=0;x<=1+dimx;++x)
 	{
-		texture[x]=new float*[dimy+2];
+		texture[x]=new int*[dimy+2];
 		for(int y=0;y<=1+dimy;++y)
 		{
-			texture[x][y]=new float[dimz+2];
+			texture[x][y]=new int[dimz+2];
 			for(int z=0;z<=1+dimz;++z)
 			{
 				texture[x][y][z]=0;
@@ -83,6 +83,11 @@ void Grid::initiate()
 	}
 	
 	is_initiate=true;
+	ghost_block_enable=false;
+	ghost_block_x=0;
+	ghost_block_y=0;
+	ghost_block_z=0;
+
 }
 
 
@@ -123,7 +128,6 @@ void Grid::block_semi_active(int xx, int yy, int zz, int text)
 	if (isPositionValid(xx,yy,zz))
 	{
 		if (filled[xx][yy][zz]==255) return;
-		texture[xx][yy][zz]=text;
 		
 		int n=0;
 		int x,y,z;
@@ -153,7 +157,12 @@ void Grid::block_semi_active(int xx, int yy, int zz, int text)
 		}
 
 		if (semi_block_valid[n])
+		{
+			texture[xx][yy][zz]=text;
 			filled[xx][yy][zz]|=n;
+			glDeleteLists(display_list,1);
+			display_list=0;
+		}
 	}
 }
 void Grid::block_active(int x, int y, int z, int text)
@@ -183,6 +192,7 @@ void Grid::draw()
 
 
 	glCallList(display_list);
+	draw_block_ghost_helper();
 }
 
 
@@ -398,4 +408,59 @@ void Grid::block_get_mesh(btTriangleMesh* m,int x, int y,int z)
 }
 
 
-	
+void Grid::draw_block_ghost(bool semi, int x, int y, int z,int tex)
+{
+	ghost_block_enable=2;
+	ghost_block_semi=semi;
+	ghost_block_x=x;
+	ghost_block_y=y;
+	ghost_block_z=z;
+	ghost_block_tex=tex;
+}
+
+void Grid::draw_block_ghost_helper()
+{
+	if (ghost_block_z>0)
+	{
+		if (ghost_block_enable==1)
+		{
+			int& x = ghost_block_x;
+			int& y = ghost_block_y;
+			int& z = ghost_block_z;
+			
+			if (not isPositionValid(x,y,z)) return;
+			
+			// remember the previous value of the block
+			int block_previous_type=filled[x][y][z];
+			int block_previous_texture=texture[x][y][z]; 
+
+			// apply the proper action
+			if (ghost_block_semi)
+				block_semi_active(x,y,z,ghost_block_tex);
+			else
+				block_active(x,y,z,ghost_block_tex);
+			
+
+			glEnable (GL_BLEND);
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+			// draw the block
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_block));
+			glBegin(GL_TRIANGLES);
+				generate_display_list(
+						ghost_block_x,
+						ghost_block_y,
+						ghost_block_z
+						);
+			glEnd();
+
+			glDisable (GL_BLEND);
+
+			// restore the block
+			filled[x][y][z]=block_previous_type;
+			texture[x][y][z]=block_previous_texture;
+		}
+		ghost_block_enable--;
+	}
+}
