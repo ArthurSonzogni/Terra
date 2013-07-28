@@ -8,7 +8,7 @@ Character_free_view::Character_free_view()
 	
 }
 
-void Character_free_view::update_mouse_position(int x, int y)
+void Character_free_view::update_mouse_position(float x, float y)
 {
 	camera.angle_xy_change(-x*DEGTORAD/10);
 	camera.angle_xz_change(y*DEGTORAD/10);
@@ -16,7 +16,7 @@ void Character_free_view::update_mouse_position(int x, int y)
 
 
 
-void Character_free_view::mouse_click()
+void Character_free_view::mouse_click(bool isLeft)
 {
 	Ray ray=camera.get_ray();
 	int n=0;
@@ -30,7 +30,7 @@ void Character_free_view::mouse_click()
 		ray.increment();
 		ray.get_current_position(&rayx,&rayy,&rayz);
 	}
-	if (true)
+	if (isLeft)
 	{
 		ray.decrement();
 		ray.get_current_position(&rayx,&rayy,&rayz);

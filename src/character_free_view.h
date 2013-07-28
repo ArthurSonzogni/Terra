@@ -9,8 +9,8 @@ class Character_free_view : public Character
 {	
 	public:
 		Character_free_view();
-		virtual void update_mouse_position(int x, int y);
-		virtual void mouse_click();
+		virtual void update_mouse_position(float x, float y);
+		virtual void mouse_click(bool isLeft);
 		virtual void step();
 		void setBlockType(SlotElement& s);
 	private:

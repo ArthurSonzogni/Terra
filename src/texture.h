@@ -5,7 +5,7 @@
 
 #define TEXT_BLOCK_SIZE (256.0)
 #define TEXT_X_N	(4)
-#define TEXT_Y_N	(4)
+#define TEXT_Y_N	(8)
 #define TEXT_WIDTH (TEXT_BLOCK_SIZE*TEXT_X_N)
 #define TEXT_HEIGHT (TEXT_BLOCK_SIZE*TEXT_Y_N)
 #define TEXT_X_INC	(TEXT_BLOCK_SIZE/TEXT_WIDTH)

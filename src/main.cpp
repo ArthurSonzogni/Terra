@@ -189,7 +189,7 @@ int main()
 	
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
-			character.mouse_click();
+			character.mouse_click(true);
 			mesh=g.get_mesh();
 			gm.set_world_mesh(mesh);
 		}

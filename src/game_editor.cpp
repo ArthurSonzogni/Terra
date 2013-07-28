@@ -66,55 +66,78 @@ void Game_editor::process()
 					running=false;
 					state = game_editor_state_exit;
 				}
+				else if (event.key.code == sf::Keyboard::Space)
+				{
+					if (game_editor_menu.isFocusOn())
+						game_editor_menu.give_focus();
+					else
+						game_editor_menu.take_focus();
+
+				}
 			}
 			else if (event.type == sf::Event::MouseButtonPressed)
 			{
-				if (event.mouseButton.button == sf::Mouse :: Left)
-					character.mouse_click();
+				if (game_editor_menu.isFocusOn())
+				{
+					if (event.mouseButton.button == sf::Mouse :: Left)
+						game_editor_menu.getMouseInfo(true,event.mouseButton.x,event.mouseButton.y);
+				}
+				else
+				{
+					if (event.mouseButton.button == sf::Mouse :: Left)
+						character.mouse_click(true);
+					else if (event.mouseButton.button == sf::Mouse :: Right)
+						character.mouse_click(false);
+				}
+			}
+			else if (event.type == sf::Event::MouseMoved)
+			{
+				if (game_editor_menu.isFocusOn())
+				{
+					game_editor_menu.getMouseInfo(false,event.mouseMove.x,event.mouseMove.y);
+				}
 			}
 			else if (event.type == sf::Event::MouseWheelMoved)
 			{
-				if (event.mouseWheel.delta>0)
+				if (event.mouseWheel.delta>0.0)
 				{
 					game_editor_menu.increaseSelectedSlot();
 				}
-				else if (event.mouseWheel.delta<0)
+				else if (event.mouseWheel.delta<0.0)
 				{
 					game_editor_menu.decreaseSelectedSlot();
 				}
 			}
 		}
-		cout<<"-----"<<endl;
-		cout<<"event pool="<<int(cgrid.getElapsedTime().asSeconds()*30*100)<<endl;
-		cgrid.restart();
 
+		
+		if (not game_editor_menu.isFocusOn())
+		{
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-			character.move_left();
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+				character.move_left();
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-			character.move_right();
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+				character.move_right();
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-			character.move_forward();
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+				character.move_forward();
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-			character.move_backward();
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+				character.move_backward();
+
+			character.step();
 	
+			sf::Vector2i position = sf::Mouse::getPosition(*window);
+			character.update_mouse_position(position.x-400.0,-(position.y-300.0));
+			position.x=400;
+			position.y=300;
+			sf::Mouse::setPosition(position,*window);
+			scene.setCameraMatrix(character.get_view());
+		}
+
 		SlotElement sl=game_editor_menu.getCurrentSlotElement();
 		character.setBlockType(sl);
-
-		character.step();
-
-		sf::Vector2i position = sf::Mouse::getPosition(*window);
-		character.update_mouse_position(position.x-400,-(position.y-300));
-		position.x=400;
-		position.y=300;
-		sf::Mouse::setPosition(position,*window);
-		scene.setCameraMatrix(character.get_view());
-
-		cout<<"direct event="<<int(cgrid.getElapsedTime().asSeconds()*30*100)<<endl;
-		cgrid.restart();
 
 
 		
@@ -140,19 +163,13 @@ void Game_editor::process()
 		game_editor_menu.draw();
 
 
-		cout<<"drawing="<<int(cgrid.getElapsedTime().asSeconds()*30*100)<<endl;
-		cgrid.restart();
 		window->display();
-		cout<<"window display="<<int(cgrid.getElapsedTime().asSeconds()*30*100)<<endl;
 
 		double time_elapsed=c.getElapsedTime().asSeconds();
 		
-		cgrid.restart();
 		sf::sleep(sf::seconds(1.0/30.0-time_elapsed));
-		cout<<"sleeping ="<<int(cgrid.getElapsedTime().asSeconds()*30*100)<<endl;
 		
 		time_elapsed=c.getElapsedTime().asSeconds();
-		cout<<"TOTAL TIME="<<int((time_elapsed)*30*100)<<endl;
 
 		c.restart();
 		}

@@ -43,18 +43,28 @@ class Game_editor_menu
 		 int selectedSlot; 
 		 vector<SlotElement> slotContent;
 		 void spriteAssignBlockTexture(sf::Sprite& spr, int textureIndex);
+		 void draw_board(int x1, int y1, int width, int height, int alpha, int filled);
 
+		 /**********
+		  * Mouse  *
+		  **********/
+		 bool mouseClic;
+		 int mouseX;
+		 int mouseY;
 	public:
 		void setScreen(sf::RenderWindow* Screen);
 		void draw();
 		Game_editor_menu();
 		~Game_editor_menu();
 		void give_focus();
+		void take_focus();
 		bool isFocusOn();
 		SlotElement getCurrentSlotElement();
 
 		void increaseSelectedSlot();
 		void decreaseSelectedSlot();
+		
+		void getMouseInfo(bool clic, int x, int y);
 };
 
 

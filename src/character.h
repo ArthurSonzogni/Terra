@@ -15,9 +15,9 @@ class Character
 	public:
 		Character();
 		void set_grid(Grid* grid);
-		virtual void mouse_click();
+		virtual void mouse_click(bool isLeft);
 		virtual void step();
-		virtual void update_mouse_position(int x, int y);
+		virtual void update_mouse_position(float x, float  y);
 		virtual void move_forward();
 		virtual void move_backward();
 		virtual void move_left();

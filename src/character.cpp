@@ -11,11 +11,11 @@ void Character::set_grid(Grid* G)
 {
 	grid=G;
 }
-void Character::mouse_click()
+void Character::mouse_click(bool isLeft)
 {
 
 }
-void Character::update_mouse_position(int x, int y)
+void Character::update_mouse_position(float x, float y)
 {
 }
 
