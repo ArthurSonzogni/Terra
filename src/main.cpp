@@ -13,6 +13,7 @@
 #include "scene.h"
 
 #include "game_editor.h"
+#include "player_group.h"
 
 
 int andom=3;
@@ -40,6 +41,60 @@ bool z_ok(int x,int y,int z)
 
 int main()
 {
+	cout<<"serveur(0) ou client(1) ?"<<endl;
+	int reponse;
+	cin>>reponse;
+	if (reponse==0)
+	{
+		PlayerGroup playerServer(true);
+		int i=0;
+		while(1)
+		{
+			if (playerServer.waitNewClient())
+			{	
+				i++;
+				for(int j=0;j<i;j++)
+				{
+					Message message;
+					message.type=56;
+					message.identity=j;
+					playerServer.sendMessage(message);
+				}
+			}
+			Message message=playerServer.checkMessage();
+			if (message.type!=Message::Nothing)
+			{
+				cout<<"message:";
+				if (message.type==Message::UdpPort)
+					cout<<"UdpPort"<<endl;
+				else
+					cout<<endl;
+			}
+		}
+	}
+	else
+	{
+		string ipAddr;
+		cout<<"Entrer l'adress Ip:";
+		cin>>ipAddr;
+		PlayerGroup playerClient(false);
+		while(not playerClient.connectTo(ipAddr));
+
+	
+		while(true)
+		{
+			Message message=playerClient.checkMessage();
+			if (message.type!=Message::Nothing)
+			{
+				cout<<"message:";
+				if (message.type==Message::UdpPort)
+					cout<<"UdpPort"<<endl;
+				else
+					cout<<endl;
+			}
+		}
+
+	}
 
     // crée la fenêtre
     sf::RenderWindow window(sf::VideoMode(800, 600), "OpenGL", sf::Style::Default, sf::ContextSettings(32));

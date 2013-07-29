@@ -189,7 +189,7 @@ void Game_editor_menu::draw_helper()
 			slotContent[selectedSlot].type=SlotElementTypeSemiBlock;
 		
 
-		draw_board(10,10,screen->getSize().x-20,screen->getSize().y-64*3-10,128,true);
+		//draw_board(10,10,screen->getSize().x-20,screen->getSize().y-64*3-10,128,true);
 		// texture
 		int nbTexture=TEXT_X_N*TEXT_Y_N;
 		int textureBoardX=screen->getSize().x-20-20;

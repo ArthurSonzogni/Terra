@@ -12,5 +12,6 @@ file(GLOB_RECURSE source_file src/*)
 add_executable(terra ${source_file})
 
 # link configuration
-target_link_libraries(terra BulletDynamics.so GLEW jpeg BulletCollision LinearMath sfml-audio sfml-graphics sfml-window sfml-system GL
+target_link_libraries(terra BulletDynamics.so GLEW jpeg BulletCollision
+	LinearMath sfml-network sfml-audio sfml-graphics sfml-window sfml-system GL
 	GLU glut)
