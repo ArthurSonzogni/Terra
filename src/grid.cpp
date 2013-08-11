@@ -464,3 +464,56 @@ void Grid::draw_block_ghost_helper()
 		ghost_block_enable--;
 	}
 }
+
+Grid* Grid::allocCopy()
+{
+	Grid* retour=new Grid();
+	retour->set_dimension(dimx,dimy,dimz);
+
+	// copy
+	for(int x=1;x<=dimx;++x)
+	for(int y=1;y<=dimy;++y)
+	for(int z=1;z<=dimz;++z)
+	{
+		retour->assignBlock(x,y,z,filled[x][y][z],texture[x][y][z]);
+	}
+	
+	return retour;
+}
+
+void Grid::copy(Grid& grid)
+{
+	int dx,dy,dz;
+	grid.get_dimension(dx,dy,dz);
+	set_dimension(dx,dy,dz);
+	
+	int*** filledPtr;
+	int*** texturePtr;
+	grid.getPtr(filledPtr,texturePtr);
+	// copy
+	for(int x=1;x<=dimx;++x)
+	for(int y=1;y<=dimy;++y)
+	for(int z=1;z<=dimz;++z)
+	{
+		assignBlock(x,y,z,filledPtr[x][y][z],texturePtr[x][y][z]);
+	}
+}
+
+void Grid::assignBlock(int x, int y, int z, int block, int t)
+{
+	cout<<"x("<<x<<") y("<<y<<") z("<<z<<")"<<endl;
+	filled[x][y][z]=block;
+	texture[x][y][z]=t;
+}
+
+void Grid::getPtr(int***& filledPtr, int***& texturePtr)
+{
+	filledPtr=filled;
+	texturePtr=texture;
+}
+void Grid::get_dimension(int& Dimx, int& Dimy, int& Dimz)
+{
+	Dimx=dimx;
+	Dimy=dimy;
+	Dimz=dimz;
+}

@@ -4,9 +4,12 @@
 #include <SFML/Network.hpp>
 #include <vector>
 #include <iostream>
+#include "grid.h"
 using namespace std;
 
-#define SERVER_PORT 2202
+
+#define SERVER_PORT 2014
+
 
 class Message
 {
@@ -15,7 +18,11 @@ class Message
 		enum MessageType
 		{
 			Nothing,
-			UdpPort
+			UdpPort,
+			StartParty,
+			LevelLoadingStart,
+			LevelLoading,
+			LevelLoadingEnd
 		};
 
 		sf::Int8 type;
@@ -23,7 +30,12 @@ class Message
 
 		union
 		{
+			sf::Uint8 joueurId;
 			sf::Uint16 udpPort;
+			float bowlMatrix[16];
+			float moveAngle;
+			Grid* grid;
+			sf::Int8 gridPacketLength;
 		} content;
 };
 
@@ -35,6 +47,7 @@ class Player
 	public:
 		sf::TcpSocket socket;
 		int udpPort;
+		float bowlMatrix[16];
 };
 
 class PlayerGroup
@@ -45,6 +58,7 @@ class PlayerGroup
 		bool isServer();
 		/*---Server-----------*/
 		bool waitNewClient();
+		int getNbPlayer();
 
 		/*---Client----*/
 		bool connectTo(sf::IpAddress);
@@ -65,6 +79,9 @@ class PlayerGroup
 		/*---Both------*/
 		sf::UdpSocket udpSocket;
 		int udpPort;
+
+		vector<float[16]> bowlPosition;
+		sf::Uint8 joueurId;
 
 
 };

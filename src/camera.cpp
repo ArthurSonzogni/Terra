@@ -67,3 +67,11 @@ Ray Camera::get_ray()
 	);
 	return ray;
 }
+
+void Camera::setPosition(int X, int Y, int Z)
+{
+	x=X;
+	y=Y;
+	z=Z;
+}
+

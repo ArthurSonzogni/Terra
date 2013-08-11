@@ -12,19 +12,32 @@ void main (void)
 	(gl_LightSource[0].ambient * gl_FrontMaterial.ambient);
 							
 
-	float biais1 = 0.003;
+	float biais1 = 0.005;
 	float biais2 = 0.003;
 	float visibility = 0.0;
-	float c=0.001;
-	visibility += 4.0*shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(+0.00,+0.00),(ShadowCoord.z-biais1)/ShadowCoord.w) ).r;
-	visibility += 2.0*shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(c,0),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
-	visibility += 2.0*shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(-c,0),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
-	visibility += 2.0*shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(0,c),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
-	visibility += 2.0*shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(0,-c),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
-	visibility += 1.0*shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(c,c),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
-	visibility += 1.0*shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(-c,c),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
-	visibility += 1.0*shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(-c,c),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
-	visibility += 1.0*shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(-c,-c),(ShadowCoord.z-biais2)/ShadowCoord.w) ).r;
+	float c=0.002;
+	float current_z=ShadowCoord.z-biais2;
+	visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(c,c),(current_z)/ShadowCoord.w) ).r;
+	visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(-c,c),(current_z)/ShadowCoord.w) ).r;
+	visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(-c,c),(current_z)/ShadowCoord.w) ).r;
+	visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(-c,-c),(current_z)/ShadowCoord.w) ).r;
+
+	if(visibility>0.2 || visibility<=3.8)
+	{
+		visibility+=4.0*shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(+0.00,+0.00),(ShadowCoord.z-biais1)/ShadowCoord.w) ).r;
+		for(int cc=1;cc<3;cc++)
+		{
+			float ccc=c/float(cc);
+			visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(ccc,0),(current_z)/ShadowCoord.w) ).r;
+			visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(-ccc,0),(current_z)/ShadowCoord.w) ).r;
+			visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(0,ccc),(current_z)/ShadowCoord.w) ).r;
+			visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(0,-ccc),(current_z)/ShadowCoord.w) ).r;
+		}
+	}
+	else
+	{
+		visibility=16.0;
+	}
 
 	vec3 N = normalize(normal);
 	vec3 L = normalize(lightDir);
@@ -32,8 +45,7 @@ void main (void)
 	float lambertTerm = dot(N,L);
 
 	vec4 light_added_color=vec4(0.0,0.0,0.0,0.0);
-	if(lambertTerm > 0.0)
-	{
+	if(lambertTerm > 0.0) {
 		light_added_color += gl_LightSource[0].diffuse * 
 		               gl_FrontMaterial.diffuse * 
 					   lambertTerm;	
@@ -47,7 +59,7 @@ void main (void)
 		               gl_FrontMaterial.specular * 
 					   specular;	
 	}
-	light_added_color*=visibility/25.0;
+	light_added_color*=visibility/30.0;
 	vec4 color = texture2D(tex,gl_TexCoord[0].xy);
 
 	gl_FragColor = color*(ambient_color+light_added_color);

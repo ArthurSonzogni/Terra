@@ -22,6 +22,7 @@ class Camera
 		void angle_xy_change(float increment);
 		void angle_xz_change(float increment);
 		Ray get_ray();
+		void setPosition(int X, int Y, int Z);
 
 		glm::mat4 get_view();
 };

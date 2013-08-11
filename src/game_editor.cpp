@@ -5,11 +5,13 @@
 //----- Grid loading function ----//
 int Game_editor::levelLoadFromFile(char* filename)
 {
+	//TODO
 
 }
-void Game_editor::Game_editor::levelLoadFromGrid(Grid* grid)
+void Game_editor::levelLoadFromGrid(Grid* g)
 {
-
+	deleteGrid();
+	grid=g->allocCopy();
 }
 void Game_editor::levelLoadEmpty()
 {
@@ -37,13 +39,12 @@ void Game_editor::levelSaveToGrid()
 //----- Execution function -------//
 void Game_editor::process()
 {
-	if (!grid|!window|!objectProgram|!shadowProgram) return;
+	if (!grid||!window||!objectProgram||!shadowProgram) return;
 
 	bool running=true;
 	sf::Clock c;
 	while(running)
 	{
-		sf::Clock cgrid;
 		//event management
 		sf::Event event;
 		while (window->pollEvent(event))
@@ -52,7 +53,7 @@ void Game_editor::process()
 			{
 				// the program is stopped
 				running = false;
-				state = game_editor_state_exit_all;
+				state = exit_all;
 			}
 			else if (event.type == sf::Event::Resized)
 			{
@@ -64,7 +65,7 @@ void Game_editor::process()
 				if (event.key.code == sf::Keyboard::Escape)
 				{
 					running=false;
-					state = game_editor_state_exit;
+					state = exit;
 				}
 				else if (event.key.code == sf::Keyboard::Space)
 				{
@@ -139,18 +140,13 @@ void Game_editor::process()
 		SlotElement sl=game_editor_menu.getCurrentSlotElement();
 		character.setBlockType(sl);
 
+		int cx,cy,cz;
+		character.getPosition(cx,cy,cz);
+		scene.setCameraPosition(cx,cy,cz);
 
-		
 		// drawing phase
 		for(int mode=BINDFORSHADOW;mode<=BINDFOROBJECT;++mode)
 		{
-			if (mode==BINDFORSHADOW)
-			{
-				int cx,cy,cz;
-				character.getPosition(cx,cy,cz);
-				scene.setCameraPosition(cx,cy,cz);
-			}
-
 			scene.bindFor(mode);
 			
 			GLint location = glGetUniformLocation(objectProgram, "tex");
@@ -164,15 +160,10 @@ void Game_editor::process()
 
 
 		window->display();
-
 		double time_elapsed=c.getElapsedTime().asSeconds();
-		
 		sf::sleep(sf::seconds(1.0/30.0-time_elapsed));
-		
-		time_elapsed=c.getElapsedTime().asSeconds();
-
 		c.restart();
-		}
+	}
 }
 int Game_editor::getState()
 {
@@ -184,7 +175,7 @@ Game_editor::Game_editor()
 {	
 	grid=NULL;
 	window=NULL;
-	state=game_editor_state_not_ready;
+	state=not_ready;
 	objectProgram=0;
 	shadowProgram=0;	
 }

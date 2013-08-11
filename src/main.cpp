@@ -14,6 +14,8 @@
 
 #include "game_editor.h"
 #include "player_group.h"
+#include "game_play.h"
+#include "multiplayerLauncher.h"
 
 
 int andom=3;
@@ -41,61 +43,6 @@ bool z_ok(int x,int y,int z)
 
 int main()
 {
-	cout<<"serveur(0) ou client(1) ?"<<endl;
-	int reponse;
-	cin>>reponse;
-	if (reponse==0)
-	{
-		PlayerGroup playerServer(true);
-		int i=0;
-		while(1)
-		{
-			if (playerServer.waitNewClient())
-			{	
-				i++;
-				for(int j=0;j<i;j++)
-				{
-					Message message;
-					message.type=56;
-					message.identity=j;
-					playerServer.sendMessage(message);
-				}
-			}
-			Message message=playerServer.checkMessage();
-			if (message.type!=Message::Nothing)
-			{
-				cout<<"message:";
-				if (message.type==Message::UdpPort)
-					cout<<"UdpPort"<<endl;
-				else
-					cout<<endl;
-			}
-		}
-	}
-	else
-	{
-		string ipAddr;
-		cout<<"Entrer l'adress Ip:";
-		cin>>ipAddr;
-		PlayerGroup playerClient(false);
-		while(not playerClient.connectTo(ipAddr));
-
-	
-		while(true)
-		{
-			Message message=playerClient.checkMessage();
-			if (message.type!=Message::Nothing)
-			{
-				cout<<"message:";
-				if (message.type==Message::UdpPort)
-					cout<<"UdpPort"<<endl;
-				else
-					cout<<endl;
-			}
-		}
-
-	}
-
     // crée la fenêtre
     sf::RenderWindow window(sf::VideoMode(800, 600), "OpenGL", sf::Style::Default, sf::ContextSettings(32));
     window.setVerticalSyncEnabled(true);
@@ -133,6 +80,23 @@ int main()
 
 	float Light1Dir[3] = {-1.0f, -1.0f, -1.0f};
 	glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,Light1Dir);
+
+	/////////////////////////////////
+	cout<<"server(0) client(1)"<<endl;
+	int reponse;
+	cin>>reponse;
+	PlayerGroup playerGroup(reponse==0);
+
+	MultiplayerLauncher multiplayerLauncher;
+	multiplayerLauncher.process(playerGroup);
+
+	// game play
+	GamePlay gamePlay;
+	gamePlay.levelLoadFromGrid(multiplayerLauncher.getGrid());
+	gamePlay.setScreen(&window);
+	gamePlay.setProgram(programShadow,programObject);
+	gamePlay.setPlayerGroup(&playerGroup);
+	gamePlay.process();
 	
 	
 
@@ -158,8 +122,6 @@ int main()
 	int grid_dimy=50;
 	int grid_dimz=21;
 	g.set_dimension(grid_dimx,grid_dimy,grid_dimz);
-	
-
 	for(int x=0;x<grid_dimx;++x)
 	for(int y=0;y<grid_dimy;++y)
 	for(int z=0;z<grid_dimz;++z)
@@ -179,6 +141,16 @@ int main()
 					texture_block_grass
 			);
 	}
+	
+	GamePlay gameplay;
+	gameplay.setScreen(&window);
+	gameplay.setProgram(programShadow,programObject);
+	gameplay.levelLoadFromGrid(&g);
+	PlayerGroup playergroup(true);
+	gameplay.setPlayerGroup(&playergroup);
+	gameplay.process();
+	
+
 
 
 	// Character creation
@@ -198,7 +170,6 @@ int main()
 	mesh=g.get_mesh();
 	gm.set_world_mesh(mesh);
 		
-
 
     // la boucle principale
     bool running = true;

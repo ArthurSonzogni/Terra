@@ -1,70 +1,68 @@
-#ifndef GAME_EDITOR_9627AVWI
+#ifndef GAME_PLAY_3T24XN2U
 
-#define GAME_EDITOR_9627AVWI
+#define GAME_PLAY_3T24XN2U
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/OpenGL.hpp>
 #include "grid.h"
-#include "character_free_view.h"
 #include "scene.h"
-#include "game_editor_menu.h"
+#include "player_group.h"
+#include "character_player.h"
+#include "game_physic.h"
 
 
-
-class Game_editor
+class GamePlay
 {
 		enum
 		{
-			not_ready,
 			normal,
-			exit,
-			exit_all
+			exit_all,
+			exit
 		};
 	public:
 		//----- Grid loading function ----//
 		int levelLoadFromFile(char* filename);
 		void levelLoadFromGrid(Grid* grid);
-		void levelLoadEmpty();
 
-		//----- Grid saving function -----//
-		int levelSaveToFile(char* filename);
-		void levelSaveToGrid();
-			
 		//----- Execution function -------//
 		void process();
 		int getState();
 
 		//----- Instanciation function ---//
-		Game_editor();
-		~Game_editor();
+		GamePlay();
+		~GamePlay();
 
 		//----- Scene initilisation function ----//
 		void setProgram(GLuint shadowProgram, GLuint objectProgram);
 		
 		void setScreen(sf::RenderWindow* w);
-		
+
+		//-----Network-PlayerGroup-----//
+		void setPlayerGroup(PlayerGroup* p);
 
 	private:
-
-		Character_free_view character;
 		Grid* grid;
 		Scene scene;
-		Game_editor_menu game_editor_menu;
-
 		int state;
-
 		
+		Character_player character;
+
+		Game_physic game_physic;
+		btBvhTriangleMeshShape* mesh;
+
 		GLuint objectProgram;
 		GLuint shadowProgram;
 		
 		sf::RenderWindow* window;
-
-		
 		//----- Helper member function -------//
 		void deleteGrid();	
-		
+		void deleteMesh();
+		void loadMesh();
+
+		//-----Network-PlayerGroup-----//
+		PlayerGroup* playergroup;
 };
 
-
-#endif /* end of include guard: GAME_EDITOR_9627AVWI */
+#endif /* end of include guard: GAME_PLAY_3T24XN2U */

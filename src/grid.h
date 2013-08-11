@@ -50,17 +50,25 @@ class Grid
 		Grid();
 		
 		void set_dimension(int Dimx, int Dimy, int Dimz);
+		void get_dimension(int& Dimx, int& Dimy, int& Dimz);
 		void block_semi_active(int x, int y, int z, int text);
 		void block_active(int x, int y, int z, int text);
 		void block_delete(int x, int y, int z);
+		void assignBlock(int x, int y, int z, int block, int texture);
 		void draw();
 		btBvhTriangleMeshShape* get_mesh();
 		
 		int get_filled(int x, int y, int z);
 		
+
+		void getPtr(int***& filledPtr, int***& texturePtr);
+
+
 		~Grid();
 		
 		void draw_block_ghost(bool semi, int x, int y, int z, int tex);
+		Grid* allocCopy();
+		void copy(Grid& grid);
 };
 
 
