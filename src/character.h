@@ -6,6 +6,8 @@
 #include "grid.h"
 
 
+class Grid;
+
 class Character
 {
 	public:

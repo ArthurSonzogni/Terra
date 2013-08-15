@@ -81,14 +81,29 @@ int main()
 	float Light1Dir[3] = {-1.0f, -1.0f, -1.0f};
 	glLightfv(GL_LIGHT0,GL_SPOT_DIRECTION,Light1Dir);
 
+	glDepthFunc(GL_LEQUAL);
 	/////////////////////////////////
 	cout<<"server(0) client(1)"<<endl;
 	int reponse;
 	cin>>reponse;
 	PlayerGroup playerGroup(reponse==0);
-
+	
+	
 	MultiplayerLauncher multiplayerLauncher;
+	if (reponse==0)
+	{
+		// game editor
+		Game_editor game_editor;
+		game_editor.levelLoadEmpty();
+		game_editor.setScreen(&window);
+		game_editor.setProgram(programShadow,programObject);
+		game_editor.process();
+
+		Grid* g=game_editor.getGrid();
+		multiplayerLauncher.setGrid(*g);
+	}
 	multiplayerLauncher.process(playerGroup);
+	
 
 	// game play
 	GamePlay gamePlay;
@@ -97,25 +112,13 @@ int main()
 	gamePlay.setProgram(programShadow,programObject);
 	gamePlay.setPlayerGroup(&playerGroup);
 	gamePlay.process();
+
 	
-	
 
-	// game editor
-	Game_editor game_editor;
-	game_editor.levelLoadEmpty();
-	game_editor.setScreen(&window);
-	game_editor.setProgram(programShadow,programObject);
-	game_editor.process();
-
-
-
-	//*
 	// scene
 	Scene scene;
 	scene.setShadowProgram(programShadow);
 	scene.setObjectProgram(programObject);
-
-
 
 	Grid g;
 	int grid_dimx=50;
@@ -150,8 +153,6 @@ int main()
 	gameplay.setPlayerGroup(&playergroup);
 	gameplay.process();
 	
-
-
 
 	// Character creation
 	Character_free_view character;
@@ -256,7 +257,7 @@ int main()
 			glActiveTexture(GL_TEXTURE0);
 
 
-			g.draw();
+			g.draw(scene);
 			
 			{
 				GLint location = glGetUniformLocation(programObject, "tex");

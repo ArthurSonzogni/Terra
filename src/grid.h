@@ -1,13 +1,22 @@
 #ifndef GRID_V9ZCSRYS
 #define GRID_V9ZCSRYS
 
-#include <iostream>
+#include <GL/glew.h>
 #include <SFML/OpenGL.hpp>
+#include <iostream>
 #include "color_manager.h"
 #include <list>
 #include <btBulletDynamicsCommon.h>
 
 using namespace std;
+
+class Scene;
+#include "scene.h"
+
+struct IntCoord
+{
+	int x,y,z;
+};
 
 class Grid
 {
@@ -44,7 +53,7 @@ class Grid
 		int  ghost_block_y;
 		int  ghost_block_z;
 		int  ghost_block_tex;
-		void draw_block_ghost_helper();
+		void draw_block_ghost_helper(Scene& scene);
 		
 	public:
 		Grid();
@@ -55,20 +64,30 @@ class Grid
 		void block_active(int x, int y, int z, int text);
 		void block_delete(int x, int y, int z);
 		void assignBlock(int x, int y, int z, int block, int texture);
-		void draw();
+		void block_start_point(int x, int y, int z);
+		void block_end_point(int x, int y, int z);
+		void draw(Scene& scene);
+		
+		enum
+		{
+			DRAW_STARTS_POINT = 1,
+			DRAW_END_POINT = 2
+		};
+		void draw_special(unsigned int flag,Scene& scene);
+		void draw_special_start_point(int x, int y , int z, Scene& scene);
+
 		btBvhTriangleMeshShape* get_mesh();
 		
 		int get_filled(int x, int y, int z);
-		
-
 		void getPtr(int***& filledPtr, int***& texturePtr);
-
 
 		~Grid();
 		
 		void draw_block_ghost(bool semi, int x, int y, int z, int tex);
 		Grid* allocCopy();
 		void copy(Grid& grid);
+		
+		list<IntCoord> getStartPointList();
 };
 
 

@@ -88,6 +88,11 @@ btTransform Game_physic::get_sphere_transformation(int index)
 	return trans;
 }
 
+void Game_physic::set_sphere_transformation(int index, btTransform tr)
+{
+	sphere[index]->getMotionState()->setWorldTransform(tr);
+}
+
 void Game_physic::stepSimulation(float time)
 {
 	dynamicsWorld->stepSimulation(time,30);

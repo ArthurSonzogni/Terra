@@ -132,6 +132,11 @@ void Game_editor_menu::draw_helper()
 					sprite.setTextureRect(sf::IntRect(0,64,32,32));
 					screen->draw(sprite);
 				} break;
+				case SlotElementTypeStartPoint:
+				{
+					sprite.setTextureRect(sf::IntRect(64,64,32,32));
+					screen->draw(sprite);
+				} break;
 			}
 			sprite.move(64,0);
 		}
@@ -188,6 +193,12 @@ void Game_editor_menu::draw_helper()
 		if (mouseClic and sprite.getGlobalBounds().contains(mouseX,mouseY))
 			slotContent[selectedSlot].type=SlotElementTypeSemiBlock;
 		
+		// Third item : StartPoint
+		sprite.setTextureRect(sf::IntRect(64,64,32,32));
+		sprite.setPosition(xStart+64*selectedSlot+48,yStart-64*2+80);
+		screen->draw(sprite);
+		if (mouseClic and sprite.getGlobalBounds().contains(mouseX,mouseY))
+			slotContent[selectedSlot].type=SlotElementTypeStartPoint;
 
 		//draw_board(10,10,screen->getSize().x-20,screen->getSize().y-64*3-10,128,true);
 		// texture

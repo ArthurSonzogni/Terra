@@ -1,6 +1,9 @@
 #include "grid.h"
 #include "semi_block_generator.h"
 #include "texture.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 Grid::Grid():
 	dimx(0),
@@ -185,14 +188,14 @@ void Grid::block_delete(int x, int y, int z)
 	}
 }
 
-void Grid::draw()
+void Grid::draw(Scene& scene)
 {
 	if (display_list==0)
 		generate_display_list();
 
 
 	glCallList(display_list);
-	draw_block_ghost_helper();
+	draw_block_ghost_helper(scene);
 }
 
 
@@ -246,6 +249,10 @@ void Grid::generate_display_list(int x,int y, int z)
 	int i,j,k;
 	if (filled[x][y][z])
 	{
+		// special block
+		if (texture[x][y][z] >= 254)
+			return;
+			
 		if (filled[x-1][y][z]==255 &&
 			filled[x+1][y][z]==255 &&
 			filled[x][y-1][z]==255 &&
@@ -418,7 +425,7 @@ void Grid::draw_block_ghost(bool semi, int x, int y, int z,int tex)
 	ghost_block_tex=tex;
 }
 
-void Grid::draw_block_ghost_helper()
+void Grid::draw_block_ghost_helper(Scene& scene)
 {
 	if (ghost_block_z>0)
 	{
@@ -445,15 +452,22 @@ void Grid::draw_block_ghost_helper()
 			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			// draw the block
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_block));
-			glBegin(GL_TRIANGLES);
-				generate_display_list(
-						ghost_block_x,
-						ghost_block_y,
-						ghost_block_z
-						);
-			glEnd();
+			if (ghost_block_tex==255)
+			{
+				draw_special_start_point(x,y,z,scene);
+			}
+			else
+			{
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_block));
+				glBegin(GL_TRIANGLES);
+					generate_display_list(
+							ghost_block_x,
+							ghost_block_y,
+							ghost_block_z
+							);
+				glEnd();
+			}
 
 			glDisable (GL_BLEND);
 
@@ -501,7 +515,6 @@ void Grid::copy(Grid& grid)
 
 void Grid::assignBlock(int x, int y, int z, int block, int t)
 {
-	cout<<"x("<<x<<") y("<<y<<") z("<<z<<")"<<endl;
 	filled[x][y][z]=block;
 	texture[x][y][z]=t;
 }
@@ -516,4 +529,143 @@ void Grid::get_dimension(int& Dimx, int& Dimy, int& Dimz)
 	Dimx=dimx;
 	Dimy=dimy;
 	Dimz=dimz;
+}
+
+void Grid::draw_special_start_point(int x, int y , int z, Scene& scene)
+{
+	if (scene.getBinding()==BINDFORSHADOW) return;	
+
+	// setting up the transformation
+	glm::mat4 mat=glm::translate(glm::mat4(1.0),glm::vec3(x+0.5,y+0.5,z+0.5));
+	scene.setModelViewMatrix(mat);
+	scene.sendModelViewMatrix();
+
+	// drawing the contener
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_block));
+	glBegin(GL_QUADS);
+
+	glTexCoord2f(0.0,0.0);
+	
+
+	if (filled[x][y][z+1]!=255 or texture[x][y][z+1]!=255)
+	{
+		glNormal3f(0.0,0.0,-1.0);
+		glVertex3f(  0.5, -0.5, 0.5 );
+		glVertex3f( -0.5, -0.5, 0.5 );
+		glVertex3f( -0.5,  0.5, 0.5 );
+		glVertex3f(  0.5,  0.5, 0.5 );
+	}
+		
+	if (filled[x+1][y][z]!=255 or texture[x+1][y][z]!=255)
+	{
+		glNormal3f(-1.0,0.0,0.0);
+		glVertex3f( 0.5, -0.5, -0.5 );
+		glVertex3f( 0.5, -0.5,  0.5 );
+		glVertex3f( 0.5,  0.5,  0.5 );
+		glVertex3f( 0.5,  0.5, -0.5 );
+	}
+	 
+	if (filled[x-1][y][z]!=255 or texture[x-1][y][z]!=255)
+	{
+		glNormal3f(1.0,0.0,0.0);
+		glVertex3f( -0.5, -0.5,  0.5 );
+		glVertex3f( -0.5, -0.5, -0.5 );
+		glVertex3f( -0.5,  0.5, -0.5 );
+		glVertex3f( -0.5,  0.5,  0.5 );
+	}
+	 
+	if (filled[x][y+1][z]!=255 or texture[x][y+1][z]!=255)
+	{
+		glNormal3f(0.0,-1.0,0.0);
+		glVertex3f(  0.5,  0.5,  0.5 );
+		glVertex3f( -0.5,  0.5,  0.5 );
+		glVertex3f( -0.5,  0.5, -0.5 );
+		glVertex3f(  0.5,  0.5, -0.5 );
+	}
+	 
+	if (filled[x][y-1][z]!=255 or texture[x][y-1][z]!=255)
+	{
+		glNormal3f(0.0,1.0,0.0);
+		glVertex3f(  0.5, -0.5, -0.5 );
+		glVertex3f( -0.5, -0.5, -0.5 );
+		glVertex3f( -0.5, -0.5,  0.5 );
+		glVertex3f(  0.5, -0.5,  0.5 );
+	}
+
+	if (filled[x][y][z-1]!=255 or texture[x][y][z-1]!=255)
+	{
+		glNormal3f(0.0,0.0,1.0);
+		glVertex3f(  0.5, -0.5, -0.5 );
+		glVertex3f(  0.5,  0.5, -0.5 );
+		glVertex3f( -0.5,  0.5, -0.5 );
+		glVertex3f( -0.5, -0.5, -0.5 );
+	}
+
+	glEnd();
+	
+
+	// drawing the sphere
+	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
+	GLUquadricObj *quadric=gluNewQuadric();
+	gluQuadricNormals(quadric, GLU_SMOOTH);
+	gluQuadricTexture(quadric, GL_TRUE);
+	gluSphere(quadric, 0.5f,20,20);
+	gluDeleteQuadric(quadric);
+}
+void Grid::draw_special(unsigned int flag, Scene& scene)
+{
+
+
+	int x,y,z;
+	for(x=1;x<dimx;++x)
+	for(y=1;y<dimx;++y)
+	for(z=1;z<dimx;++z)
+	{
+		int& b=texture[x][y][z];
+
+		// draw Start-Point
+		if (b==255 && (flag|DRAW_STARTS_POINT))
+		{
+			if (filled[x][y][z]==255)
+			{
+				draw_special_start_point(x,y,z,scene);
+			}
+		}
+	}
+}
+void Grid::block_start_point(int x, int y, int z)
+{
+	if (isPositionValid(x,y,z))
+	{
+		filled[x][y][z]=255;
+		texture[x][y][z]=255;
+	}
+}
+void Grid::block_end_point(int x, int y, int z)
+{
+	if (isPositionValid(x,y,z))
+	{
+		filled[x][y][z]=255;
+		texture[x][y][z]=254;
+	}
+}
+
+list<IntCoord> Grid::getStartPointList()
+{
+	list<IntCoord> startPointList;
+	{
+		for(int x=1;x<=dimx;++x)
+		for(int y=1;y<=dimy;++y)
+		for(int z=1;z<=dimz;++z)
+		{
+			if (filled[x][y][z])
+			if (texture[x][y][z])
+			{
+				IntCoord element={x,y,z};
+				startPointList.push_front(element);
+			}
+		}
+	}
+	return startPointList;
 }

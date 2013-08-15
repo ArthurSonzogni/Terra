@@ -40,7 +40,7 @@ Scene::Scene():
 
 	// setting up default matrix;
 	setCameraPosition(0,0,0);
-	camera_projection_matrix=glm::perspective<float>(70.f, 1.f, 0.01f, 500.f);
+	camera_projection_matrix=glm::perspective<float>(70.f, 800.f/600.f, 0.1f, 500.f);
 	camera_matrix=glm::lookAt(
 			glm::vec3(0,0,0),
 			glm::vec3(1,1,1),
@@ -48,7 +48,7 @@ Scene::Scene():
 	);
 
 	//light_projection_matrix=glm::perspective<float>(70.f, 1.f, 0.01f, 500.f);
-	light_projection_matrix=glm::ortho<float>(-20,20,-20,20,-10,40);
+	light_projection_matrix=glm::ortho<float>(-25,25,-25,25,0,100);
 	
 	biaisMatrix=glm::mat4
 	(
@@ -165,9 +165,13 @@ void Scene::setCameraMatrix(glm::mat4 camera)
 }
 
 
-void Scene::multModelViewMatrix(glm::mat4 m)
+void Scene::multModelViewMatrix(glm::mat4& m)
 {
 	modelview_matrix*=m;
+}
+void Scene::setModelViewMatrix(glm::mat4& m)
+{
+	modelview_matrix=m;
 }
 
 void Scene::sendModelViewMatrix()
@@ -202,7 +206,11 @@ void Scene::setCameraPosition(int x, int y, int z)
 {
 	light_matrix=glm::lookAt(
 			glm::vec3(x-5,y-5,z+10),
-			glm::vec3(x+5,y+5,z-8),
+			glm::vec3(x+6,y+5,z-8),
 			glm::vec3(0,0,1)
 	);
+}
+int Scene::getBinding()
+{
+	return currentMode;
 }

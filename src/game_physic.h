@@ -33,6 +33,8 @@ class Game_physic
 		void sphere_applyTorque(int index, float dx, float dy, float dz);
 		void sphere_applyImpulse(int index, float dx, float dy, float dz);
 		btTransform get_sphere_transformation(int index);
+		void  set_sphere_transformation(int index, btTransform tr);
+
 
 		// world mesh function
 		void set_world_mesh(btBvhTriangleMeshShape* mesh);

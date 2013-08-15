@@ -3,7 +3,11 @@ uniform sampler2D tex;
 
 varying vec3 normal, lightDir, eyeVec;
 varying vec4 ShadowCoord;
+varying vec4 modelviewPosition;
 
+float rand(vec2 co){
+	    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
 
 void main (void)
 {
@@ -11,38 +15,77 @@ void main (void)
 	(gl_FrontLightModelProduct.sceneColor * gl_FrontMaterial.ambient) + 
 	(gl_LightSource[0].ambient * gl_FrontMaterial.ambient);
 							
-
-	float biais1 = 0.005;
-	float biais2 = 0.003;
-	float visibility = 0.0;
-	float c=0.002;
-	float current_z=ShadowCoord.z-biais2;
-	visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(c,c),(current_z)/ShadowCoord.w) ).r;
-	visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(-c,c),(current_z)/ShadowCoord.w) ).r;
-	visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(-c,c),(current_z)/ShadowCoord.w) ).r;
-	visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(-c,-c),(current_z)/ShadowCoord.w) ).r;
-
-	if(visibility>0.2 || visibility<=3.8)
-	{
-		visibility+=4.0*shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(+0.00,+0.00),(ShadowCoord.z-biais1)/ShadowCoord.w) ).r;
-		for(int cc=1;cc<3;cc++)
-		{
-			float ccc=c/float(cc);
-			visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(ccc,0),(current_z)/ShadowCoord.w) ).r;
-			visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(-ccc,0),(current_z)/ShadowCoord.w) ).r;
-			visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(0,ccc),(current_z)/ShadowCoord.w) ).r;
-			visibility += shadow2D( shadowMap, vec3(ShadowCoord.xy+vec2(0,-ccc),(current_z)/ShadowCoord.w) ).r;
-		}
-	}
-	else
-	{
-		visibility=16.0;
-	}
-
 	vec3 N = normalize(normal);
 	vec3 L = normalize(lightDir);
 	
 	float lambertTerm = dot(N,L);
+
+	float biais1 = clamp(tan(acos(lambertTerm)),0.0,333.0)*0.003;
+	float visibility = 0.0;
+	float c=0.002;
+	float current_depth=(ShadowCoord.z-biais1)/ShadowCoord.w;
+	visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+vec2(c,0),current_depth)).r;
+	visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+vec2(0,c),current_depth)).r;
+	visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+vec2(-c,0),current_depth)).r;
+	visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+vec2(0,-c),current_depth)).r;
+
+	if (visibility<0.1)
+		visibility=0.0;
+	else if (visibility>3.9)
+		visibility=16.0;
+	else
+	{
+		c*=0.5;
+		visibility=0.0;
+		mat2 turn;
+		turn[0][0]=cos(1);
+		turn[1][0]=sin(1);
+		turn[0][1]=-sin(1);
+		turn[1][1]=cos(1);
+
+		mat2 v1=mat2(c,c,-c,-c);
+		mat2 v2=mat2(c,-c,-c,c);
+		visibility=0.0;
+		for(int i=0;i<16;++i)
+		{
+			visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+v1[0],current_depth)).r;
+			visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+v1[1],current_depth)).r;
+			visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+v2[0],current_depth)).r;
+			visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+v2[1],current_depth)).r;
+			v1=turn*v1;
+			v2=turn*v2;
+			turn*=0.99;
+		}
+		visibility*=16.0/64.0;
+	}
+
+	//visibility=16.0-(16.0-visibility)*(16.0-visibility)/16.0;
+	
+	
+	float sx=abs(ShadowCoord.x-0.5);
+	float sy=abs(ShadowCoord.y-0.5);
+	if (sx>0.2 || sy>0.2)
+	{
+		float s=clamp((0.5-sx)*5.0,0.0,1.0)*clamp((0.5-sy)*5.0,0.0,1.0);
+		visibility=s*visibility+(1.0-s)*16.0;
+	}
+	/*float sx=ShadowCoord.x;*/
+	/*sx=(1.0-sx*(1.0-sx)*4.0);*/
+	/*sx=sx*sx;*/
+	/*sx=1.0-sx*sx;*/
+
+	/*float sy=ShadowCoord.y;*/
+	/*sy=(1.0-sy*(1.0-sy)*4.0);*/
+	/*sy=sy*sy;*/
+	/*sy=1.0-sy*sy;*/
+	
+	/*sx=max(sx,0.0);*/
+	/*sy=max(sy,0.0);*/
+
+	/*float s=sx*sy;*/
+
+	/*visibility=s*visibility+(1.0-s)*16.0;*/
+
 
 	vec4 light_added_color=vec4(0.0,0.0,0.0,0.0);
 	if(lambertTerm > 0.0) {

@@ -11,7 +11,9 @@ enum SlotElementType
 {
 	SlotElementTypeNone,
 	SlotElementTypeBlock,
-	SlotElementTypeSemiBlock
+	SlotElementTypeSemiBlock,
+	SlotElementTypeStartPoint,
+	SlotElementTypeEndPoint
 };
 
 struct SlotElement

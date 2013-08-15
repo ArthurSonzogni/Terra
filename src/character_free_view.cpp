@@ -48,6 +48,10 @@ void Character_free_view::mouse_click(bool isLeft)
 			{
 				grid->block_active(rayx,rayy,rayz,slotElement.subtype);
 			} break;
+			case SlotElementTypeStartPoint:
+			{
+				grid->block_start_point(rayx,rayy,rayz);
+			} break;
 		}
 	}
 	else
@@ -86,6 +90,14 @@ void Character_free_view::step()
 			case SlotElementTypeBlock:
 			{
 				grid->draw_block_ghost(false,rayx,rayy,rayz,slotElement.subtype);
+			} break;
+			case SlotElementTypeStartPoint:
+			{
+				grid->draw_block_ghost(false,rayx,rayy,rayz,255);
+			} break;
+			case SlotElementTypeEndPoint:
+			{
+				grid->draw_block_ghost(false,rayx,rayy,rayz,1);
 			} break;
 		}
 	}

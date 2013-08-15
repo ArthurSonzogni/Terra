@@ -153,7 +153,8 @@ void Game_editor::process()
 			glUniform1i(location,0);
 			glActiveTexture(GL_TEXTURE0);
 
-			grid->draw();
+			grid->draw(scene);
+			grid->draw_special(Grid::DRAW_STARTS_POINT|Grid::DRAW_END_POINT,scene);
 			
 		}
 		game_editor_menu.draw();
@@ -207,4 +208,9 @@ void Game_editor::deleteGrid()
 		delete grid;
 		grid=NULL;
 	}	
+}
+
+Grid* Game_editor::getGrid()
+{
+	return grid;
 }

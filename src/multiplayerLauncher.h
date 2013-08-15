@@ -9,6 +9,7 @@ class MultiplayerLauncher
 		int getState();
 		void process(PlayerGroup& playerGroup);
 		Grid* getGrid();
+		void setGrid(Grid& g);
 	private:
 		int state;
 		Grid grid;

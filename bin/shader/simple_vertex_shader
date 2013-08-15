@@ -6,22 +6,23 @@ uniform sampler2D tex;
 
 varying vec3 normal, lightDir, eyeVec;
 varying vec4 ShadowCoord;
+varying vec4 modelviewPosition;
 
 
 
 void main()
 {	
-	vec4 vertex_after_modelview= modelview_mat * gl_Vertex;
+	modelviewPosition = modelview_mat * gl_Vertex;
 
 	normal = vec3(camera_mat_without_projection * modelview_mat * vec4(gl_Normal,0.0));
 
-	vec3 vVertex = vec3(camera_mat_without_projection * vertex_after_modelview);
+	vec3 vVertex = vec3(camera_mat_without_projection * modelviewPosition);
 	lightDir = vec3(camera_mat_without_projection * vec4(-1,-1,2,0));
 	eyeVec = -vVertex;
 
 
-	gl_Position = camera_mat * vertex_after_modelview;
+	gl_Position = camera_mat * modelviewPosition;
 	gl_TexCoord[0] = gl_MultiTexCoord0;
 	
-	ShadowCoord = light_mat * vertex_after_modelview;
+	ShadowCoord = light_mat * modelviewPosition;
 }

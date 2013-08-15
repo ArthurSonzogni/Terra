@@ -8,7 +8,7 @@
 using namespace std;
 
 
-#define SERVER_PORT 2014
+#define SERVER_PORT 2341
 
 
 class Message
@@ -22,7 +22,10 @@ class Message
 			StartParty,
 			LevelLoadingStart,
 			LevelLoading,
-			LevelLoadingEnd
+			LevelLoadingEnd,
+			Okay,
+			BowlMatrix,
+			Move
 		};
 
 		sf::Int8 type;
@@ -32,7 +35,11 @@ class Message
 		{
 			sf::Uint8 joueurId;
 			sf::Uint16 udpPort;
-			float bowlMatrix[16];
+			struct
+			{
+				sf::Uint8 player;
+				float mat[16];
+			} bowlMatrix;
 			float moveAngle;
 			Grid* grid;
 			sf::Int8 gridPacketLength;

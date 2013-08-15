@@ -133,7 +133,7 @@ Message PlayerGroup::checkMessage()
 			}
 			else
 			{
-				message.identity=-1;
+				//message.identity=-1;
 			}
 		}
 	}
@@ -154,7 +154,7 @@ void PlayerGroup::sendMessage(const Message& message)
 }
 sf::Packet& operator<<(sf::Packet& packet, const Message& message)
 {
-	cout<<"message<<"<<int(message.type)<<endl;
+	//cout<<"message<<"<<int(message.type)<<endl;
 	switch (message.type)
 	{
 		case Message::Nothing:
@@ -167,7 +167,11 @@ sf::Packet& operator<<(sf::Packet& packet, const Message& message)
 		} break;
 		case Message::StartParty:
 		{
-			return packet<<(message.type)<<(message.content.joueurId);
+			return packet<<(message.type)<<(message.identity);
+		} break;
+		case Message::Okay:
+		{
+			return packet<<(message.type);
 		} break;
 		case Message::LevelLoadingStart:
 		{
@@ -188,6 +192,8 @@ sf::Packet& operator<<(sf::Packet& packet, const Message& message)
 			packet<<(message.type);
 			int length=message.content.gridPacketLength;
 			packet<<length;
+			
+			cout<<"sending :"<<messageGridIndex<<endl;
 
 			sf::Uint8 filled, texture;
 			int dx,dy,dz;
@@ -213,12 +219,38 @@ sf::Packet& operator<<(sf::Packet& packet, const Message& message)
 		{
 			return packet<<(message.type);
 		}break;
+		case Message::BowlMatrix:
+		{
+			return packet<<(message.type)
+				<<(message.content.bowlMatrix.player)
+				<<(message.content.bowlMatrix.mat[0])
+				<<(message.content.bowlMatrix.mat[1])
+				<<(message.content.bowlMatrix.mat[2])
+				<<(message.content.bowlMatrix.mat[3])
+				<<(message.content.bowlMatrix.mat[4])
+				<<(message.content.bowlMatrix.mat[5])
+				<<(message.content.bowlMatrix.mat[6])
+				<<(message.content.bowlMatrix.mat[7])
+				<<(message.content.bowlMatrix.mat[8])
+				<<(message.content.bowlMatrix.mat[9])
+				<<(message.content.bowlMatrix.mat[10])
+				<<(message.content.bowlMatrix.mat[11])
+				<<(message.content.bowlMatrix.mat[12])
+				<<(message.content.bowlMatrix.mat[13])
+				<<(message.content.bowlMatrix.mat[14])
+				<<(message.content.bowlMatrix.mat[15]);
+		} break;
+		case Message::Move:
+		{
+			packet<<(message.type)
+				<<(message.content.moveAngle);
+		} break;
 	}
 }
 sf::Packet& operator>>(sf::Packet& packet, Message& message)
 {
 	sf::Packet& p=(packet>>message.type);
-	cout<<"message>> "<<int(message.type)<<endl;
+	//cout<<"message>> "<<int(message.type)<<endl;
 	switch (message.type)
 	{
 		case Message::Nothing:
@@ -231,7 +263,11 @@ sf::Packet& operator>>(sf::Packet& packet, Message& message)
 		} break;
 		case Message::StartParty:
 		{
-			return p>>(message.content.joueurId);
+			return p>>(message.identity);
+		} break;
+		case Message::Okay:
+		{
+			return p;
 		} break;
 		case Message::LevelLoadingStart:
 		{
@@ -245,6 +281,7 @@ sf::Packet& operator>>(sf::Packet& packet, Message& message)
 		{
 			int length;
 			packet>>length;
+			cout<<"receiving :"<<messageGridIndex<<endl;
 			sf::Uint8 filled, texture;
 			int dx,dy,dz;
 			messageGridBuffer.get_dimension(dx,dy,dz);
@@ -263,6 +300,31 @@ sf::Packet& operator>>(sf::Packet& packet, Message& message)
 		{
 			message.content.grid=messageGridBuffer.allocCopy();
 			return p;
+		} break;
+		case Message::BowlMatrix:
+		{
+			return p
+				>>(message.content.bowlMatrix.player)
+				>>(message.content.bowlMatrix.mat[0])
+				>>(message.content.bowlMatrix.mat[1])
+				>>(message.content.bowlMatrix.mat[2])
+				>>(message.content.bowlMatrix.mat[3])
+				>>(message.content.bowlMatrix.mat[4])
+				>>(message.content.bowlMatrix.mat[5])
+				>>(message.content.bowlMatrix.mat[6])
+				>>(message.content.bowlMatrix.mat[7])
+				>>(message.content.bowlMatrix.mat[8])
+				>>(message.content.bowlMatrix.mat[9])
+				>>(message.content.bowlMatrix.mat[10])
+				>>(message.content.bowlMatrix.mat[11])
+				>>(message.content.bowlMatrix.mat[12])
+				>>(message.content.bowlMatrix.mat[13])
+				>>(message.content.bowlMatrix.mat[14])
+				>>(message.content.bowlMatrix.mat[15]);
+		} break;
+		case Message::Move:
+		{
+			packet>>(message.content.moveAngle);
 		} break;
 	}
 }

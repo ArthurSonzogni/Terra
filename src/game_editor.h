@@ -30,6 +30,7 @@ class Game_editor
 		//----- Grid saving function -----//
 		int levelSaveToFile(char* filename);
 		void levelSaveToGrid();
+		Grid* getGrid();
 			
 		//----- Execution function -------//
 		void process();

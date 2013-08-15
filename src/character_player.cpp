@@ -18,5 +18,5 @@ void Character_player::step()
 
 void Character_player::setBowlPosition(int x, int y, int z)
 {
-
+	camera.setPosition(x,y,z);
 }

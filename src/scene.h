@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <list>
 using namespace std;
 
 
@@ -47,13 +48,16 @@ class Scene
 		void bindForShadow();
 		void bindForObject();
 		void bindFor(int mode);
+		int getBinding();
 		
 		void setShadowProgram(GLuint program);
 		void setObjectProgram(GLuint program);
 		
 		void setCameraMatrix(glm::mat4 camera);
 		
-		void multModelViewMatrix(glm::mat4 m);
+
+		void setModelViewMatrix(glm::mat4& m);
+		void multModelViewMatrix(glm::mat4& m);
 		void sendModelViewMatrix();
 		void pushModelViewMatrix();
 		void popModelViewMatrix();
