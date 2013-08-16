@@ -38,7 +38,6 @@ semi_block_generator_filler::semi_block_generator_filler()
 		1.f,1.f,1.f,
 	};
 	float vertices[3*8];
-	int n_vertice=8;
 	int i;
 	// for every possible semi_cube
 	for(i=0;i<256;++i)

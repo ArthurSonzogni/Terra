@@ -22,7 +22,7 @@ Game_physic::Game_physic()
 Game_physic::~Game_physic()
 {
 	// delete sphere
-	int i;
+	unsigned int  i;
 	for(i=0;i<sphere.size();++i)
 	{
 		remove_sphere(i);
@@ -142,13 +142,17 @@ void Game_physic::set_world_mesh(btBvhTriangleMeshShape* mesh)
 
 void Game_physic::sphere_applyTorque(int index, float dx, float dy, float dz)
 {
-	if (index<0 or index>=sphere.size()) return;
+	if (index<0 or index>=int(sphere.size())) return;
 	if (!sphere[index]) return ;
 	sphere[index]->applyTorqueImpulse(btVector3(dx,dy,dz));
 }
 void Game_physic::sphere_applyImpulse(int index, float dx, float dy, float dz)
 {
-	if (index<0 or index>=sphere.size()) return;
+	if (index<0 or index>=int(sphere.size())) return;
 	if (!sphere[index]) return ;
 	sphere[index]->applyCentralImpulse(btVector3(dx,dy,dz));
+}
+int Game_physic::getNbSphere()
+{
+	return sphere.size();
 }

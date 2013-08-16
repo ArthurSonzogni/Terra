@@ -95,7 +95,7 @@ Message PlayerGroup::checkMessage()
 	sf::Packet packet;
 	if (server)
 	{
-		for(int i=0;i<clientsPlayer.size();++i)
+		for(int i=0;i<int(clientsPlayer.size());++i)
 		{
 			if(clientsPlayer[i]->socket.receive(packet)==sf::Socket::Done)
 			{
@@ -242,9 +242,10 @@ sf::Packet& operator<<(sf::Packet& packet, const Message& message)
 		} break;
 		case Message::Move:
 		{
-			packet<<(message.type)
+			return packet<<(message.type)
 				<<(message.content.moveAngle);
 		} break;
+		default: return packet;
 	}
 }
 sf::Packet& operator>>(sf::Packet& packet, Message& message)
@@ -324,8 +325,9 @@ sf::Packet& operator>>(sf::Packet& packet, Message& message)
 		} break;
 		case Message::Move:
 		{
-			packet>>(message.content.moveAngle);
+			return packet>>(message.content.moveAngle);
 		} break;
+		default: return packet;
 	}
 }
 

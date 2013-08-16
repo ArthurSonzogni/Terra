@@ -72,7 +72,6 @@ int main()
 	float Light1Spec[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 	float Light1Amb[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 
-	GLfloat  matShininess[]={1.0};
 
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, Light1Dif);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, Light1Spec);

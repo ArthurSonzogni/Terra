@@ -2,6 +2,7 @@
 #include <cmath>
 #include <SFML/OpenGL.hpp>
 #include <iostream>
+#include <cmath>
 using namespace std;
 
 Camera::Camera():
@@ -68,10 +69,22 @@ Ray Camera::get_ray()
 	return ray;
 }
 
-void Camera::setPosition(int X, int Y, int Z)
+void Camera::setPosition(float X, float Y, float Z)
 {
 	x=X;
 	y=Y;
 	z=Z;
 }
 
+void Camera::lookAt(float X, float Y, float Z)
+{
+	float dx=X-x;
+	float dy=Y-y;
+	float dz=Z-z;
+	float norme1=sqrt(dx*dx+dy*dy+dz*dz);
+	float norme2=sqrt(dx*dx+dy*dy);
+	float scalareProduct=(dx*dx+dy*dy)/(norme1*norme2);
+	angle_xy=atan2(dy,dx);
+	angle_xz=acos(scalareProduct);
+	if (dz<0.0) angle_xz=-angle_xz;
+}

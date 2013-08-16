@@ -3,17 +3,21 @@
 
 #include "character.h"
 
+struct floatCoord
+{
+	float x,y,z;
+};
+
 class Character_player : public Character
 {	
 	public:
 		Character_player();
 		virtual void update_mouse_position(float x, float y);
 		virtual void step();
-		void setBowlPosition(int x, int y, int z);
+		void setBowlPosition(float x, float y, float z);
 	private:
-		int bowlPosition_x;
-		int bowlPosition_y;
-		int bowlPosition_z;
+		list<floatCoord> bowlPosition;
+		float bowlAngle;
 };
 
 

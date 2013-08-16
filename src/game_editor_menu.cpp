@@ -34,9 +34,9 @@ Game_editor_menu::Game_editor_menu()
 	 /**********
 	  * Mouse  *
 	  **********/
-	 bool mouseClic=false;
-	 int mouseX=0;
-	 int mouseY=0;
+	 mouseClic=false;
+	 mouseX=0;
+	 mouseY=0;
 	//**************************//
 	image_loading();
 }

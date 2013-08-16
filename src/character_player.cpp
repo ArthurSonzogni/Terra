@@ -16,7 +16,15 @@ void Character_player::step()
 
 }
 
-void Character_player::setBowlPosition(int x, int y, int z)
+void Character_player::setBowlPosition(float X, float Y, float Z)
 {
-	camera.setPosition(x,y,z);
+	if (bowlPosition.size()>=10)
+		bowlPosition.pop_back();
+	floatCoord position={X,Y,Z};
+	bowlPosition.push_front(position);
+	
+	// compute the camera position
+	
+	camera.setPosition(X-3,Y-3,Z+3);
+	camera.lookAt(X,Y,Z);
 }

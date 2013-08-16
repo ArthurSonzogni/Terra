@@ -1,10 +1,12 @@
 #include "game_play.h"
 
+#include "texture.h"
 
 //----- Grid loading function ----//
 int GamePlay::levelLoadFromFile(char* filename)
 {
 	//TODO
+	return 0;
 }
 void GamePlay::levelLoadFromGrid(Grid* g)
 {
@@ -243,9 +245,11 @@ void GamePlay::process()
 		character.getPosition(cx,cy,cz);
 		scene.setCameraPosition(cx,cy,cz);
 
+		cout<<"Marcelo"<<endl;
 		// drawing phase
 		for(int mode=BINDFORSHADOW;mode<=BINDFOROBJECT;++mode)
 		{
+			// drawing grid
 			scene.bindFor(mode);
 			
 			GLint location = glGetUniformLocation(objectProgram, "tex");
@@ -254,6 +258,45 @@ void GamePlay::process()
 
 			grid->draw(scene);
 			
+			// drawing sphere
+			scene.pushModelViewMatrix();
+			{
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
+			}
+			for(int i=0;i<game_physic.getNbSphere();++i)
+			{
+				btTransform tr=game_physic.get_sphere_transformation(i);
+				btScalar m[16];
+				tr.getOpenGLMatrix(m);
+				glm::mat4 mat=glm::mat4(
+						m[0],
+						m[1],
+						m[2],
+						m[3],
+						m[4],
+						m[5],
+						m[6],
+						m[7],
+						m[8],
+						m[9],
+						m[10],
+						m[11],
+						m[12],
+						m[13],
+						m[14],
+						m[15]
+				);
+				scene.setModelViewMatrix(mat);
+				scene.sendModelViewMatrix();
+				// drawing the sphere
+				GLUquadricObj *quadric=gluNewQuadric();
+				gluQuadricNormals(quadric, GLU_SMOOTH);
+				gluQuadricTexture(quadric, GL_TRUE);
+				gluSphere(quadric, 1.0f,20,20);
+				gluDeleteQuadric(quadric);
+			}
+			scene.popModelViewMatrix();
 		}
 		window->display();
 
@@ -268,7 +311,53 @@ void GamePlay::process()
 
 		}
 		
+		
+		if (playergroup->isServer())
+		{
+			// for each player sending every balls
+			for(int i=0;i<playergroup->getNbPlayer();++i)
+			{
+				for(int j=0;j<=playergroup->getNbPlayer();++j)
+				{
+					Message message;
+					message.identity=i;
+					message.type=Message::BowlMatrix;
 
+					btTransform tr=game_physic.get_sphere_transformation(j);
+					btScalar m[16];
+					tr.getOpenGLMatrix(m);
+					for(int k=0;k<16;++k)
+					{
+						message.content.bowlMatrix.mat[k]=m[k];
+					}
+					message.content.bowlMatrix.player=j;
+					playergroup->sendMessage(message);
+					cout<<"sending bowl "<<j<<" to player "<<i<<endl;
+
+				}
+			}
+		}
+		else
+		{	
+			Message message;
+			message.type=Message::Nothing;
+			int timeout=2;
+			for(;;)
+			{
+				cout<<int(message.type)<<endl;
+				message=playergroup->checkMessage();
+				if (message.type==Message::Nothing) break;
+				if (message.type==Message::BowlMatrix)
+				{
+					btTransform tr;
+					tr.setFromOpenGLMatrix(message.content.bowlMatrix.mat);
+					int idPlayer=message.content.bowlMatrix.player;
+					cout<<"receiving bowl "<<idPlayer<<endl;
+					game_physic.set_sphere_transformation(idPlayer,tr);
+				}
+				if (timeout--<0) break;
+			}
+		}
 		double time_elapsed=c.getElapsedTime().asSeconds();
 		sf::sleep(sf::seconds(1.0/30.0-time_elapsed));
 		c.restart();

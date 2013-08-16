@@ -15,7 +15,6 @@ void MultiplayerLauncher::process(PlayerGroup& playerGroup)
 	if (playerGroup.isServer())
 	{
 		PlayerGroup& playerServer=playerGroup;
-		int i=0;
 		while(playerServer.getNbPlayer()<1)
 		{
 			playerServer.waitNewClient();

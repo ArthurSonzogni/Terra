@@ -6,7 +6,7 @@
 int Game_editor::levelLoadFromFile(char* filename)
 {
 	//TODO
-
+	return 0;
 }
 void Game_editor::levelLoadFromGrid(Grid* g)
 {
@@ -29,7 +29,7 @@ void Game_editor::levelLoadEmpty()
 //----- Grid saving function -----//
 int Game_editor::levelSaveToFile(char* filename)
 {
-
+	return 0;
 }
 void Game_editor::levelSaveToGrid()
 {

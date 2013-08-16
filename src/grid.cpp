@@ -213,6 +213,7 @@ void Grid::generate_display_list()
 
 	glMaterialfv(GL_FRONT,GL_SPECULAR,MatSpec);
 	glMaterialfv(GL_FRONT,GL_AMBIENT,MatAmb);
+	glMaterialfv(GL_FRONT,GL_DIFFUSE,MatDif);
 	glMaterialfv(GL_FRONT,GL_SHININESS,MatShininess);
 	
 	display_list=glGenLists(1);
@@ -260,13 +261,8 @@ void Grid::generate_display_list(int x,int y, int z)
 			filled[x][y][z-1]==255 &&
 			filled[x][y][z+1]==255)
 		return;
-		static int c=0;
 		i=filled[x][y][z];
 
-		// change color model of the block
-		float MatDif[4] = {0.5f, 0.5f, 0.5f, 1.0f};
-
-		//glMaterialfv(GL_FRONT,GL_DIFFUSE,color[x][y][z]);
 
 		for(j=0;j<semi_block_n_face[i];++j)
 		{
@@ -366,7 +362,6 @@ void Grid::block_get_mesh(btTriangleMesh* m,int x, int y,int z)
 			filled[x][y][z-1]==255 &&
 			filled[x][y][z+1]==255)
 		return;
-		static int c=0;
 		i=filled[x][y][z];
 
 		for(j=0;j<semi_block_n_face[i];++j)
