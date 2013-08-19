@@ -95,46 +95,77 @@ Message PlayerGroup::checkMessage()
 	sf::Packet packet;
 	if (server)
 	{
-		for(int i=0;i<int(clientsPlayer.size());++i)
+		bool breakTheLoop=false;
+		for(int i=0;i<int(clientsPlayer.size()) and !breakTheLoop;++i)
 		{
-			if(clientsPlayer[i]->socket.receive(packet)==sf::Socket::Done)
+			switch (clientsPlayer[i]->socket.receive(packet))
 			{
-				packet>>message;
-				if (message.type==Message::UdpPort)
+				case sf::Socket::Done:
 				{
-					clientsPlayer[i]->udpPort=message.content.udpPort;
-					cout<<"my port:"<<udpPort<<" is port:"<<clientsPlayer[i]->udpPort<<endl;
-					return checkMessage();
-				}
-				else if (message.type==Message::StartParty)
+					packet>>message;
+					if (message.type==Message::UdpPort)
+					{
+						clientsPlayer[i]->udpPort=message.content.udpPort;
+						cout<<"my port:"<<udpPort<<" is port:"<<clientsPlayer[i]->udpPort<<endl;
+						return checkMessage();
+					}
+					else if (message.type==Message::StartParty)
+					{
+						joueurId=message.content.joueurId;
+						breakTheLoop=true;
+					}
+					else
+					{
+						message.identity=i;
+						breakTheLoop=true;
+					}
+				} break;
+				case sf::Socket::NotReady:
 				{
-					joueurId=message.content.joueurId;
-					break;
-				}
-				else
+					cout<<"I am Not ready"<<endl;
+				} break;
+				case sf::Socket::Error:
 				{
-					message.identity=i;
-					break;
-				}
+					cout<<"Error"<<endl;
+				} break;
+				case sf::Socket::Disconnected:
+				{
+					cout<<"Disconnected"<<endl;
+				} break;
 			}
 		}
 	}
 	else
 	{
-		if (serverPlayer.socket.receive(packet)==sf::Socket::Done)
+		switch(serverPlayer.socket.receive(packet))
 		{
-			packet>>message;
-			if (message.type==Message::UdpPort)
+			case sf::Socket::Done:
 			{
-				serverPlayer.udpPort=message.content.udpPort;
-				message.type=Message::Nothing;
-				cout<<"my port:"<<udpPort<<" is port:"<<serverPlayer.udpPort<<endl;
-				return checkMessage();
-			}
-			else
+				packet>>message;
+				if (message.type==Message::UdpPort)
+				{
+					serverPlayer.udpPort=message.content.udpPort;
+					message.type=Message::Nothing;
+					cout<<"my port:"<<udpPort<<" is port:"<<serverPlayer.udpPort<<endl;
+					return checkMessage();
+				}
+				else
+				{
+					//message.identity=-1;
+				}
+			} break;
+			case sf::Socket::NotReady:
 			{
-				//message.identity=-1;
-			}
+				cout<<"I am Not ready"<<endl;
+			} break;
+			case sf::Socket::Error:
+			{
+				cout<<"Error"<<endl;
+			} break;
+			case sf::Socket::Disconnected:
+			{
+				cout<<"Disconnected"<<endl;
+			} break;
 		}
 	}
 	return message;
@@ -145,11 +176,60 @@ void PlayerGroup::sendMessage(const Message& message)
 	paquet<<message;
 	if (server)
 	{
-		clientsPlayer[message.identity]->socket.send(paquet);	
+		switch(clientsPlayer[message.identity]->socket.send(paquet))
+		{
+			case sf::Socket::Done:
+			{
+				//sf::sleep(sf::seconds(0.1));
+				return;
+			} break;
+
+			case sf::Socket::NotReady:
+			{
+				cout<<"Not Ready"<<endl;
+				sf::sleep(sf::seconds(1.0));
+				sendMessage(message);
+			};
+			
+			case sf::Socket::Disconnected:
+			{
+				cout<<"disconnected"<<endl;
+
+			} break;
+			
+			case sf::Socket::Error:
+			{
+				cout<<"error"<<endl;
+				sf::sleep(sf::seconds(1.0));
+				sendMessage(message);
+			} break;
+		}
 	}
 	else
 	{
-		serverPlayer.socket.send(paquet);
+		switch(serverPlayer.socket.send(paquet))
+		{
+			case sf::Socket::Done:
+			{
+				return;
+			} break;
+
+			case sf::Socket::NotReady:
+			{
+				cout<<"Not Ready"<<endl;
+				sendMessage(message);
+			};
+
+			case sf::Socket::Disconnected:
+			{
+				cout<<"disconnected"<<endl;
+			} break;
+			
+			case sf::Socket::Error:
+			{
+				cout<<"error"<<endl;
+			} break;
+		}
 	}
 }
 sf::Packet& operator<<(sf::Packet& packet, const Message& message)
