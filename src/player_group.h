@@ -8,7 +8,7 @@
 using namespace std;
 
 
-#define SERVER_PORT 2354
+#define SERVER_PORT 2355
 
 
 class Message

@@ -141,7 +141,9 @@ Message PlayerGroup::checkMessage()
 		{
 			case sf::Socket::Done:
 			{
+				cout<<"done"<<endl;
 				packet>>message;
+				cout<<"message.type="<<int(message.type)<<endl;
 				if (message.type==Message::UdpPort)
 				{
 					serverPlayer.udpPort=message.content.udpPort;
@@ -166,6 +168,7 @@ Message PlayerGroup::checkMessage()
 			{
 				cout<<"Disconnected"<<endl;
 			} break;
+			
 		}
 	}
 	return message;
@@ -332,6 +335,10 @@ sf::Packet& operator>>(sf::Packet& packet, Message& message)
 {
 	sf::Packet& p=(packet>>message.type);
 	//cout<<"message>> "<<int(message.type)<<endl;
+	if (p)
+		cout<<"p est vrai"<<endl;
+	else
+		cout<<"p est faux"<<endl;
 	switch (message.type)
 	{
 		case Message::Nothing:
