@@ -53,7 +53,7 @@ void MultiplayerLauncher::process(PlayerGroup& playerGroup)
 			int dx,dy,dz;
 			grid.get_dimension(dx,dy,dz);
 			int nn=dx*dy*dz;
-			int message_length=100;
+			int message_length=10;
 			int a;
 			for(a=0;a+message_length<nn;a+=message_length)
 			{

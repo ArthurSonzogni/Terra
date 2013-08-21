@@ -245,7 +245,6 @@ void GamePlay::process()
 		character.getPosition(cx,cy,cz);
 		scene.setCameraPosition(cx,cy,cz);
 
-		cout<<"Marcelo"<<endl;
 		// drawing phase
 		for(int mode=BINDFORSHADOW;mode<=BINDFOROBJECT;++mode)
 		{
@@ -303,15 +302,78 @@ void GamePlay::process()
 		// physic simulation
 		if (playergroup->isServer())
 		{
-			game_physic.stepSimulation(1.0/30.0);
+			// keyboard event
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+				game_physic.sphere_applyTorque(identity,0,1.2,0);
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+				game_physic.sphere_applyTorque(identity,-1.2,0,0);
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+				game_physic.sphere_applyTorque(identity,0,-1.2,0);
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+				game_physic.sphere_applyTorque(identity,1.2,0,0);
 			
+			// receiving others player event
+			
+			Message message;
+			for(;;)
+			{
+				message=playergroup->checkMessage();
+				if (message.type==Message::Nothing) break;
+				else if (message.type==Message::Move)
+				{
+					cout<<"message move received"<<endl;
+					switch(message.content.moveKey)
+					{
+						case Message::MoveKeyUp:
+							game_physic.sphere_applyTorque(message.identity,0,1.2,0);
+							break;
+						case Message::MoveKeyLeft:
+							game_physic.sphere_applyTorque(message.identity,-1.2,0,0);
+							break;
+						case Message::MoveKeyDown:
+							game_physic.sphere_applyTorque(message.identity,0,-1.2,0);
+							break;
+						case Message::MoveKeyRight:
+							game_physic.sphere_applyTorque(message.identity,1.2,0,0);
+							break;
+					}
+				}
+			}
+
+			// simulation
+			game_physic.stepSimulation(1.0/30.0);
 		}
 		else
 		{
+			Message message;
+			message.type=Message::Move;
 
+			// keyboard event
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+			{
+				message.content.moveKey=Message::MoveKeyUp;
+				playergroup->sendMessage(message);
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+			{
+				message.content.moveKey=Message::MoveKeyLeft;
+				playergroup->sendMessage(message);
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+			{
+				message.content.moveKey=Message::MoveKeyDown;
+				playergroup->sendMessage(message);
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+			{
+				message.content.moveKey=Message::MoveKeyRight;
+				playergroup->sendMessage(message);
+			}
 		}
-		
-		
+
+		////////////////////////////////////////
+		// sharing bowl position information //
+		//////////////////////////////////////
 		if (playergroup->isServer())
 		{
 			// for each player sending every balls
@@ -332,7 +394,7 @@ void GamePlay::process()
 					}
 					message.content.bowlMatrix.player=j;
 					playergroup->sendMessage(message);
-					cout<<"sending bowl "<<j<<" to player "<<i<<endl;
+					//cout<<"sending bowl "<<j<<" to player "<<i<<endl;
 
 				}
 			}
@@ -341,21 +403,19 @@ void GamePlay::process()
 		{	
 			Message message;
 			message.type=Message::Nothing;
-			int timeout=2;
 			for(;;)
 			{
-				cout<<int(message.type)<<endl;
+				//cout<<int(message.type)<<endl;
 				message=playergroup->checkMessage();
 				if (message.type==Message::Nothing) break;
-				if (message.type==Message::BowlMatrix)
+				else if (message.type==Message::BowlMatrix)
 				{
 					btTransform tr;
 					tr.setFromOpenGLMatrix(message.content.bowlMatrix.mat);
 					int idPlayer=message.content.bowlMatrix.player;
-					cout<<"receiving bowl "<<idPlayer<<endl;
+					//cout<<"receiving bowl "<<idPlayer<<endl;
 					game_physic.set_sphere_transformation(idPlayer,tr);
 				}
-				if (timeout--<0) break;
 			}
 		}
 		double time_elapsed=c.getElapsedTime().asSeconds();

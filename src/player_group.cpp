@@ -52,7 +52,7 @@ bool PlayerGroup::waitNewClient()
 	{
 		clientsPlayer.push_back(newClientPlayer);
 		newClientPlayer=NULL;
-		cout<<"new client connected!"<<endl;
+		cerr<<"new client connected!"<<endl;
 		// sending information about udp port
 		{
 			Message message;
@@ -72,7 +72,7 @@ bool PlayerGroup::connectTo(sf::IpAddress ipAddr)
 {
 	if (serverPlayer.socket.connect(ipAddr,SERVER_PORT)==sf::Socket::Done)
 	{
-		cout<<"connected to the server!"<<endl;
+		cerr<<"connected to the server!"<<endl;
 		// sending information about udp port
 		{
 			Message message;
@@ -98,6 +98,7 @@ Message PlayerGroup::checkMessage()
 		bool breakTheLoop=false;
 		for(int i=0;i<int(clientsPlayer.size()) and !breakTheLoop;++i)
 		{
+			clientsPlayer[i]->socket.setBlocking(false);
 			switch (clientsPlayer[i]->socket.receive(packet))
 			{
 				case sf::Socket::Done:
@@ -106,7 +107,7 @@ Message PlayerGroup::checkMessage()
 					if (message.type==Message::UdpPort)
 					{
 						clientsPlayer[i]->udpPort=message.content.udpPort;
-						cout<<"my port:"<<udpPort<<" is port:"<<clientsPlayer[i]->udpPort<<endl;
+						cerr<<"my port:"<<udpPort<<" is port:"<<clientsPlayer[i]->udpPort<<endl;
 						return checkMessage();
 					}
 					else if (message.type==Message::StartParty)
@@ -122,33 +123,34 @@ Message PlayerGroup::checkMessage()
 				} break;
 				case sf::Socket::NotReady:
 				{
-					cout<<"I am Not ready"<<endl;
+					cerr<<"I am Not ready"<<endl;
 				} break;
 				case sf::Socket::Error:
 				{
-					cout<<"Error"<<endl;
+					cerr<<"Error"<<endl;
 				} break;
 				case sf::Socket::Disconnected:
 				{
-					cout<<"Disconnected"<<endl;
+					cerr<<"Disconnected"<<endl;
 				} break;
 			}
 		}
 	}
 	else
 	{
+		serverPlayer.socket.setBlocking(false);
 		switch(serverPlayer.socket.receive(packet))
 		{
 			case sf::Socket::Done:
 			{
-				cout<<"done"<<endl;
+				cerr<<"done"<<endl;
 				packet>>message;
-				cout<<"message.type="<<int(message.type)<<endl;
+				cerr<<"message.type="<<int(message.type)<<endl;
 				if (message.type==Message::UdpPort)
 				{
 					serverPlayer.udpPort=message.content.udpPort;
 					message.type=Message::Nothing;
-					cout<<"my port:"<<udpPort<<" is port:"<<serverPlayer.udpPort<<endl;
+					cerr<<"my port:"<<udpPort<<" is port:"<<serverPlayer.udpPort<<endl;
 					return checkMessage();
 				}
 				else
@@ -158,15 +160,15 @@ Message PlayerGroup::checkMessage()
 			} break;
 			case sf::Socket::NotReady:
 			{
-				cout<<"I am Not ready"<<endl;
+				cerr<<"I am Not ready"<<endl;
 			} break;
 			case sf::Socket::Error:
 			{
-				cout<<"Error"<<endl;
+				cerr<<"Error"<<endl;
 			} break;
 			case sf::Socket::Disconnected:
 			{
-				cout<<"Disconnected"<<endl;
+				cerr<<"Disconnected"<<endl;
 			} break;
 			
 		}
@@ -179,6 +181,7 @@ void PlayerGroup::sendMessage(const Message& message)
 	paquet<<message;
 	if (server)
 	{
+		clientsPlayer[message.identity]->socket.setBlocking(true);
 		switch(clientsPlayer[message.identity]->socket.send(paquet))
 		{
 			case sf::Socket::Done:
@@ -189,20 +192,20 @@ void PlayerGroup::sendMessage(const Message& message)
 
 			case sf::Socket::NotReady:
 			{
-				cout<<"Not Ready"<<endl;
+				cerr<<"Not Ready"<<endl;
 				sf::sleep(sf::seconds(1.0));
 				sendMessage(message);
 			};
 			
 			case sf::Socket::Disconnected:
 			{
-				cout<<"disconnected"<<endl;
+				cerr<<"disconnected"<<endl;
 
 			} break;
 			
 			case sf::Socket::Error:
 			{
-				cout<<"error"<<endl;
+				cerr<<"error"<<endl;
 				sf::sleep(sf::seconds(1.0));
 				sendMessage(message);
 			} break;
@@ -210,6 +213,7 @@ void PlayerGroup::sendMessage(const Message& message)
 	}
 	else
 	{
+		serverPlayer.socket.setBlocking(true);
 		switch(serverPlayer.socket.send(paquet))
 		{
 			case sf::Socket::Done:
@@ -219,25 +223,25 @@ void PlayerGroup::sendMessage(const Message& message)
 
 			case sf::Socket::NotReady:
 			{
-				cout<<"Not Ready"<<endl;
+				cerr<<"Not Ready"<<endl;
 				sendMessage(message);
 			};
 
 			case sf::Socket::Disconnected:
 			{
-				cout<<"disconnected"<<endl;
+				cerr<<"disconnected"<<endl;
 			} break;
 			
 			case sf::Socket::Error:
 			{
-				cout<<"error"<<endl;
+				cerr<<"error"<<endl;
 			} break;
 		}
 	}
 }
 sf::Packet& operator<<(sf::Packet& packet, const Message& message)
 {
-	//cout<<"message<<"<<int(message.type)<<endl;
+	//cerr<<"message<<"<<int(message.type)<<endl;
 	switch (message.type)
 	{
 		case Message::Nothing:
@@ -276,7 +280,7 @@ sf::Packet& operator<<(sf::Packet& packet, const Message& message)
 			int length=message.content.gridPacketLength;
 			packet<<length;
 			
-			cout<<"sending :"<<messageGridIndex<<endl;
+			cerr<<"sending :"<<messageGridIndex<<endl;
 
 			sf::Uint8 filled, texture;
 			int dx,dy,dz;
@@ -326,7 +330,7 @@ sf::Packet& operator<<(sf::Packet& packet, const Message& message)
 		case Message::Move:
 		{
 			return packet<<(message.type)
-				<<(message.content.moveAngle);
+				<<(message.content.moveKey);
 		} break;
 		default: return packet;
 	}
@@ -334,11 +338,11 @@ sf::Packet& operator<<(sf::Packet& packet, const Message& message)
 sf::Packet& operator>>(sf::Packet& packet, Message& message)
 {
 	sf::Packet& p=(packet>>message.type);
-	//cout<<"message>> "<<int(message.type)<<endl;
+	//cerr<<"message>> "<<int(message.type)<<endl;
 	if (p)
-		cout<<"p est vrai"<<endl;
+		cerr<<"p est vrai"<<endl;
 	else
-		cout<<"p est faux"<<endl;
+		cerr<<"p est faux"<<endl;
 	switch (message.type)
 	{
 		case Message::Nothing:
@@ -369,7 +373,7 @@ sf::Packet& operator>>(sf::Packet& packet, Message& message)
 		{
 			int length;
 			packet>>length;
-			cout<<"receiving :"<<messageGridIndex<<endl;
+			cerr<<"receiving :"<<messageGridIndex<<endl;
 			sf::Uint8 filled, texture;
 			int dx,dy,dz;
 			messageGridBuffer.get_dimension(dx,dy,dz);
@@ -412,7 +416,7 @@ sf::Packet& operator>>(sf::Packet& packet, Message& message)
 		} break;
 		case Message::Move:
 		{
-			return packet>>(message.content.moveAngle);
+			return packet>>(message.content.moveKey);
 		} break;
 		default: return packet;
 	}
