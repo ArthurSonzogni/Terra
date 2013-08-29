@@ -535,8 +535,15 @@ void Grid::draw_special_start_point(int x, int y , int z, Scene& scene)
 	scene.setModelViewMatrix(mat);
 	scene.sendModelViewMatrix();
 
+	// drawing the sphere
+	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
+	GLUquadricObj *quadric=gluNewQuadric();
+	gluQuadricNormals(quadric, GLU_SMOOTH);
+	gluQuadricTexture(quadric, GL_TRUE);
+	gluSphere(quadric, 0.5f,20,20);
+	gluDeleteQuadric(quadric);
+
 	// drawing the contener
-	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_block));
 	glBegin(GL_QUADS);
 
@@ -600,17 +607,11 @@ void Grid::draw_special_start_point(int x, int y , int z, Scene& scene)
 	glEnd();
 	
 
-	// drawing the sphere
-	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
-	GLUquadricObj *quadric=gluNewQuadric();
-	gluQuadricNormals(quadric, GLU_SMOOTH);
-	gluQuadricTexture(quadric, GL_TRUE);
-	gluSphere(quadric, 0.5f,20,20);
-	gluDeleteQuadric(quadric);
 }
 void Grid::draw_special(unsigned int flag, Scene& scene)
 {
 
+	scene.pushModelViewMatrix();
 
 	int x,y,z;
 	for(x=1;x<dimx;++x)
@@ -628,6 +629,7 @@ void Grid::draw_special(unsigned int flag, Scene& scene)
 			}
 		}
 	}
+	scene.popModelViewMatrix();
 }
 void Grid::block_start_point(int x, int y, int z)
 {
