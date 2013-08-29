@@ -47,7 +47,7 @@ class Message
 				sf::Uint8 player;
 				float mat[16];
 			} bowlMatrix;
-			int moveKey;
+			float moveAngle;
 			Grid* grid;
 			sf::Int8 gridPacketLength;
 		} content;

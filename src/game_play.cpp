@@ -303,14 +303,15 @@ void GamePlay::process()
 		if (playergroup->isServer())
 		{
 			// keyboard event
+			float bowlAngle=character.getBowlAngle();
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
-				game_physic.sphere_applyTorque(identity,0,1.2,0);
+				game_physic.sphere_applyTorque(identity,0,1.2,0,bowlAngle);
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
-				game_physic.sphere_applyTorque(identity,-1.2,0,0);
+				game_physic.sphere_applyTorque(identity,-1.2,0,0,bowlAngle);
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-				game_physic.sphere_applyTorque(identity,0,-1.2,0);
+				game_physic.sphere_applyTorque(identity,0,-1.2,0,bowlAngle);
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-				game_physic.sphere_applyTorque(identity,1.2,0,0);
+				game_physic.sphere_applyTorque(identity,1.2,0,0,bowlAngle);
 			
 			// receiving others player event
 			
@@ -322,21 +323,8 @@ void GamePlay::process()
 				else if (message.type==Message::Move)
 				{
 					cout<<"message move received"<<endl;
-					switch(message.content.moveKey)
-					{
-						case Message::MoveKeyUp:
-							game_physic.sphere_applyTorque(message.identity,0,1.2,0);
-							break;
-						case Message::MoveKeyLeft:
-							game_physic.sphere_applyTorque(message.identity,-1.2,0,0);
-							break;
-						case Message::MoveKeyDown:
-							game_physic.sphere_applyTorque(message.identity,0,-1.2,0);
-							break;
-						case Message::MoveKeyRight:
-							game_physic.sphere_applyTorque(message.identity,1.2,0,0);
-							break;
-					}
+					float& moveAngle=message.content.moveAngle;
+					game_physic.sphere_applyTorque(message.identity,0.0,1.2,0.0,moveAngle);
 				}
 			}
 
@@ -348,25 +336,26 @@ void GamePlay::process()
 			Message message;
 			message.type=Message::Move;
 
+			float bowlAngle=character.getBowlAngle();
 			// keyboard event
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
 			{
-				message.content.moveKey=Message::MoveKeyUp;
+				message.content.moveAngle=bowlAngle;
 				playergroup->sendMessage(message);
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
 			{
-				message.content.moveKey=Message::MoveKeyLeft;
+				message.content.moveAngle=bowlAngle+1.57;
 				playergroup->sendMessage(message);
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 			{
-				message.content.moveKey=Message::MoveKeyDown;
+				message.content.moveAngle=bowlAngle+3.14;
 				playergroup->sendMessage(message);
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 			{
-				message.content.moveKey=Message::MoveKeyRight;
+				message.content.moveAngle=bowlAngle-1.57;
 				playergroup->sendMessage(message);
 			}
 		}

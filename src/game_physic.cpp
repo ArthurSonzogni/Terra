@@ -156,3 +156,11 @@ int Game_physic::getNbSphere()
 {
 	return sphere.size();
 }
+void Game_physic::sphere_applyTorque(int index, float dx, float dy, float dz, float angle)
+{
+	float ca=cos(angle);
+	float sa=sin(angle);
+	float ddx=-ca*dx+sa*dy;
+	float ddy=-sa*dx-ca*dy;
+	sphere_applyTorque(index,ddx,ddy,dz);
+}

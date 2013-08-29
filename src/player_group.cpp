@@ -330,7 +330,7 @@ sf::Packet& operator<<(sf::Packet& packet, const Message& message)
 		case Message::Move:
 		{
 			return packet<<(message.type)
-				<<(message.content.moveKey);
+				<<(message.content.moveAngle);
 		} break;
 		default: return packet;
 	}
@@ -416,7 +416,7 @@ sf::Packet& operator>>(sf::Packet& packet, Message& message)
 		} break;
 		case Message::Move:
 		{
-			return packet>>(message.content.moveKey);
+			return packet>>(message.content.moveAngle);
 		} break;
 		default: return packet;
 	}

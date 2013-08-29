@@ -32,6 +32,7 @@ class Game_physic
 		void remove_sphere(int index);
 		int getNbSphere();
 		void sphere_applyTorque(int index, float dx, float dy, float dz);
+		void sphere_applyTorque(int index, float dx, float dy, float dz, float angle);
 		void sphere_applyImpulse(int index, float dx, float dy, float dz);
 		btTransform get_sphere_transformation(int index);
 		void  set_sphere_transformation(int index, btTransform tr);

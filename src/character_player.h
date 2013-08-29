@@ -15,6 +15,7 @@ class Character_player : public Character
 		virtual void update_mouse_position(float x, float y);
 		virtual void step();
 		void setBowlPosition(float x, float y, float z);
+		float getBowlAngle();
 	private:
 		list<floatCoord> bowlPosition;
 		float bowlAngle;
