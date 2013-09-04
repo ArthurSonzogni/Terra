@@ -58,6 +58,9 @@ class Grid
 	public:
 		Grid();
 		
+		list<IntCoord> getStartPointList();
+		
+
 		void set_dimension(int Dimx, int Dimy, int Dimz);
 		void get_dimension(int& Dimx, int& Dimy, int& Dimz);
 		void block_semi_active(int x, int y, int z, int text);
@@ -86,8 +89,12 @@ class Grid
 		void draw_block_ghost(bool semi, int x, int y, int z, int tex);
 		Grid* allocCopy();
 		void copy(Grid& grid);
+
+
+		// saving and loading
+		void saveToFile(string filename);
+		void loadFromFile(string filename);
 		
-		list<IntCoord> getStartPointList();
 };
 
 

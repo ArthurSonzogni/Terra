@@ -94,6 +94,7 @@ int main()
 		// game editor
 		Game_editor game_editor;
 		game_editor.levelLoadEmpty();
+		game_editor.getGrid()->loadFromFile("hiboux.t");
 		game_editor.setScreen(&window);
 		game_editor.setProgram(programShadow,programObject);
 		game_editor.process();
@@ -102,7 +103,8 @@ int main()
 		multiplayerLauncher.setGrid(*g);
 	}
 	multiplayerLauncher.process(playerGroup);
-	
+
+	multiplayerLauncher.getGrid()->saveToFile("hiboux.t");
 
 	// game play
 	GamePlay gamePlay;

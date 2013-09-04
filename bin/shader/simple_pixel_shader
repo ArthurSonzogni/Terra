@@ -22,44 +22,42 @@ void main (void)
 
 	float biais1 = clamp(tan(acos(lambertTerm)),0.0,333.0)*0.003;
 	float visibility = 0.0;
-	float c=0.002;
+	float c=0.003;
 	float current_depth=(ShadowCoord.z-biais1)/ShadowCoord.w;
 	visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+vec2(c,0),current_depth)).r;
 	visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+vec2(0,c),current_depth)).r;
 	visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+vec2(-c,0),current_depth)).r;
 	visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+vec2(0,-c),current_depth)).r;
 
-	if (visibility<0.1)
-		visibility=0.0;
-	else if (visibility>3.9)
-		visibility=16.0;
-	else
+	if (visibility>0.1 && visibility<3.8)
 	{
-		c*=0.5;
-		visibility=0.0;
+		c*=0.707;
 		mat2 turn;
 		turn[0][0]=cos(1);
 		turn[1][0]=sin(1);
 		turn[0][1]=-sin(1);
 		turn[1][1]=cos(1);
+		turn*=0.8;
+
 
 		mat2 v1=mat2(c,c,-c,-c);
 		mat2 v2=mat2(c,-c,-c,c);
+
+
 		visibility=0.0;
-		for(int i=0;i<16;++i)
+		for(int i=0;i<8;++i)
 		{
-			visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+v1[0],current_depth)).r;
-			visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+v1[1],current_depth)).r;
-			visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+v2[0],current_depth)).r;
-			visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+v2[1],current_depth)).r;
+			visibility += shadow2D(shadowMap,vec3(ShadowCoord.xy+v1[0],current_depth)).r
+					   +  shadow2D(shadowMap,vec3(ShadowCoord.xy+v1[1],current_depth)).r
+					   +  shadow2D(shadowMap,vec3(ShadowCoord.xy+v2[0],current_depth)).r
+					   +  shadow2D(shadowMap,vec3(ShadowCoord.xy+v2[1],current_depth)).r;
 			v1=turn*v1;
 			v2=turn*v2;
-			turn*=0.99;
 		}
-		visibility*=16.0/64.0;
+		visibility*=4.0/32.0;
 	}
 
-	//visibility=16.0-(16.0-visibility)*(16.0-visibility)/16.0;
+	//visibility=4.0-(4.0-visibility)*(4.0-visibility)/4.0;
 	
 	
 	float sx=abs(ShadowCoord.x-0.5);
@@ -67,7 +65,7 @@ void main (void)
 	if (sx>0.2 || sy>0.2)
 	{
 		float s=clamp((0.5-sx)*5.0,0.0,1.0)*clamp((0.5-sy)*5.0,0.0,1.0);
-		visibility=s*visibility+(1.0-s)*16.0;
+		visibility=s*visibility+(1.0-s)*4.0;
 	}
 	/*float sx=ShadowCoord.x;*/
 	/*sx=(1.0-sx*(1.0-sx)*4.0);*/
@@ -102,7 +100,7 @@ void main (void)
 		               gl_FrontMaterial.specular * 
 					   specular;	
 	}
-	light_added_color*=visibility/30.0;
+	light_added_color*=visibility*2.0/15.0;
 	vec4 color = texture2D(tex,gl_TexCoord[0].xy);
 
 	gl_FragColor = color*(ambient_color+light_added_color);

@@ -89,13 +89,20 @@ void GamePlay::process()
 	if (playergroup->isServer())
 	{
 		// creating every balls
+		list<IntCoord> bowlReceptacle=grid->getStartPointList();
 		for(int i=0;i<playergroup->getNbPlayer();++i)
 		{
 			// creating a new ball
-			game_physic.add_sphere(10+i,10+i,10+i);
+			IntCoord position=bowlReceptacle.front();
+			bowlReceptacle.pop_front();
+			cout<<position.x<<" "<<position.y<<" "<<position.z<<endl;
+			game_physic.add_sphere(position.x,position.y,position.z+0.5);
 		}
 		// the server's ball
-		game_physic.add_sphere(10,10,10);
+		IntCoord position=bowlReceptacle.front();
+		bowlReceptacle.pop_front();
+		cout<<position.x<<" "<<position.y<<" "<<position.z<<endl;
+		game_physic.add_sphere(position.x,position.y,position.z+0.5);
 
 		// for each player sending every balls
 		for(int i=0;i<playergroup->getNbPlayer();++i)

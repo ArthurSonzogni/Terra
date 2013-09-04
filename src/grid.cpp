@@ -4,6 +4,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <fstream>
+#include <stdint.h>
+
+using namespace std;
 
 Grid::Grid():
 	dimx(0),
@@ -528,20 +532,14 @@ void Grid::get_dimension(int& Dimx, int& Dimy, int& Dimz)
 
 void Grid::draw_special_start_point(int x, int y , int z, Scene& scene)
 {
-	if (scene.getBinding()==BINDFORSHADOW) return;	
+	//if (scene.getBinding()==BINDFORSHADOW) return;	
 
 	// setting up the transformation
-	glm::mat4 mat=glm::translate(glm::mat4(1.0),glm::vec3(x+0.5,y+0.5,z+0.5));
+	glm::mat4 mat=glm::translate(glm::mat4(1.0),glm::vec3(x+0.5,y+0.5,z+1.0));
+	scene.pushModelViewMatrix();
 	scene.setModelViewMatrix(mat);
 	scene.sendModelViewMatrix();
 
-	// drawing the sphere
-	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
-	GLUquadricObj *quadric=gluNewQuadric();
-	gluQuadricNormals(quadric, GLU_SMOOTH);
-	gluQuadricTexture(quadric, GL_TRUE);
-	gluSphere(quadric, 0.5f,20,20);
-	gluDeleteQuadric(quadric);
 
 	// drawing the contener
 	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_block));
@@ -550,68 +548,61 @@ void Grid::draw_special_start_point(int x, int y , int z, Scene& scene)
 	glTexCoord2f(0.0,0.0);
 	
 
-	if (filled[x][y][z+1]!=255 or texture[x][y][z+1]!=255)
-	{
-		glNormal3f(0.0,0.0,-1.0);
-		glVertex3f(  0.5, -0.5, 0.5 );
-		glVertex3f( -0.5, -0.5, 0.5 );
-		glVertex3f( -0.5,  0.5, 0.5 );
-		glVertex3f(  0.5,  0.5, 0.5 );
-	}
+	glNormal3f(0.0,0.0,1.0);
+	glVertex3f(  0.5, -0.5, 0.0 );
+	glVertex3f(  0.5,  0.5, 0.0 );
+	glVertex3f( -0.5,  0.5, 0.0 );
+	glVertex3f( -0.5, -0.5, 0.0 );
 		
-	if (filled[x+1][y][z]!=255 or texture[x+1][y][z]!=255)
-	{
-		glNormal3f(-1.0,0.0,0.0);
-		glVertex3f( 0.5, -0.5, -0.5 );
-		glVertex3f( 0.5, -0.5,  0.5 );
-		glVertex3f( 0.5,  0.5,  0.5 );
-		glVertex3f( 0.5,  0.5, -0.5 );
-	}
+	glNormal3f(1.0,0.0,0.0);
+	glVertex3f( 0.5, -0.5,  -1.0 );
+	glVertex3f( 0.5,  0.5,  -1.0 );
+	glVertex3f( 0.5,  0.5,  0.0 );
+	glVertex3f( 0.5, -0.5,  0.0 );
 	 
-	if (filled[x-1][y][z]!=255 or texture[x-1][y][z]!=255)
-	{
-		glNormal3f(1.0,0.0,0.0);
-		glVertex3f( -0.5, -0.5,  0.5 );
-		glVertex3f( -0.5, -0.5, -0.5 );
-		glVertex3f( -0.5,  0.5, -0.5 );
-		glVertex3f( -0.5,  0.5,  0.5 );
-	}
+	glNormal3f(-1.0,0.0,0.0);
+	glVertex3f( -0.5, -0.5,  0.0 );
+	glVertex3f( -0.5,  0.5,  0.0 );
+	glVertex3f( -0.5,  0.5,  -1.0 );
+	glVertex3f( -0.5, -0.5,  -1.0 );
 	 
-	if (filled[x][y+1][z]!=255 or texture[x][y+1][z]!=255)
-	{
-		glNormal3f(0.0,-1.0,0.0);
-		glVertex3f(  0.5,  0.5,  0.5 );
-		glVertex3f( -0.5,  0.5,  0.5 );
-		glVertex3f( -0.5,  0.5, -0.5 );
-		glVertex3f(  0.5,  0.5, -0.5 );
-	}
+	glNormal3f(0.0,1.0,0.0);
+	glVertex3f(  0.5,  0.5,  0.0 );
+	glVertex3f(  0.5,  0.5,  -1.0 );
+	glVertex3f( -0.5,  0.5,  -1.0 );
+	glVertex3f( -0.5,  0.5,  0.0 );
 	 
-	if (filled[x][y-1][z]!=255 or texture[x][y-1][z]!=255)
-	{
-		glNormal3f(0.0,1.0,0.0);
-		glVertex3f(  0.5, -0.5, -0.5 );
-		glVertex3f( -0.5, -0.5, -0.5 );
-		glVertex3f( -0.5, -0.5,  0.5 );
-		glVertex3f(  0.5, -0.5,  0.5 );
-	}
+	glNormal3f(0.0,-1.0,0.0);
+	glVertex3f(  0.5, -0.5,  -1.0 );
+	glVertex3f(  0.5, -0.5,  0.0 );
+	glVertex3f( -0.5, -0.5,  0.0 );
+	glVertex3f( -0.5, -0.5,  -1.0 );
 
-	if (filled[x][y][z-1]!=255 or texture[x][y][z-1]!=255)
-	{
-		glNormal3f(0.0,0.0,1.0);
-		glVertex3f(  0.5, -0.5, -0.5 );
-		glVertex3f(  0.5,  0.5, -0.5 );
-		glVertex3f( -0.5,  0.5, -0.5 );
-		glVertex3f( -0.5, -0.5, -0.5 );
-	}
+	glNormal3f(0.0,0.0,-1.0);
+	glVertex3f(  0.5, -0.5,  -1.0 );
+	glVertex3f( -0.5, -0.5,  -1.0 );
+	glVertex3f( -0.5,  0.5,  -1.0 );
+	glVertex3f(  0.5,  0.5,  -1.0 );
 
 	glEnd();
+
+	// drawing the sphere
+	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
+	GLUquadricObj *quadric=gluNewQuadric();
+	gluQuadricNormals(quadric, GLU_SMOOTH);
+	gluQuadricTexture(quadric, GL_TRUE);
+	gluSphere(quadric, 1.0f,20,20);
+	gluDeleteQuadric(quadric);
+
+	// restaure default texture
+	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_block));
 	
+	scene.popModelViewMatrix();
+	scene.sendModelViewMatrix();
 
 }
 void Grid::draw_special(unsigned int flag, Scene& scene)
 {
-
-	scene.pushModelViewMatrix();
 
 	int x,y,z;
 	for(x=1;x<dimx;++x)
@@ -629,7 +620,6 @@ void Grid::draw_special(unsigned int flag, Scene& scene)
 			}
 		}
 	}
-	scene.popModelViewMatrix();
 }
 void Grid::block_start_point(int x, int y, int z)
 {
@@ -656,13 +646,98 @@ list<IntCoord> Grid::getStartPointList()
 		for(int y=1;y<=dimy;++y)
 		for(int z=1;z<=dimz;++z)
 		{
-			if (filled[x][y][z])
-			if (texture[x][y][z])
+			if (filled[x][y][z]==255)
+			if (texture[x][y][z]==255)
 			{
 				IntCoord element={x,y,z};
 				startPointList.push_front(element);
+				filled[x][y][z]=0;
+				texture[x][y][z]=0;
 			}
 		}
 	}
 	return startPointList;
+}
+
+
+// saving and loading
+
+void atomize(int i,uint8_t& a, uint8_t& b)
+{
+	a=i/256;
+	b=i%256;
+}
+
+void unize(int& i,uint8_t a, uint8_t b)
+{
+	i=int(a)*256+int(b);
+}
+
+#define VERSION 1;
+void Grid::saveToFile(string filename)
+{
+	ofstream file(filename.c_str(),ios::out|ios::trunc|ios::binary);
+	if (!file)
+	{
+		cerr << "error : impossible to open : " << filename <<endl;
+		return;
+	}
+	
+	uint8_t v=1;
+	file.write((const char*)&v,1);
+
+	uint8_t a,b;
+	atomize(dimx,a,b);
+	file.write((const char*)&a,1);
+	file.write((const char*)&b,1);
+	atomize(dimy,a,b);
+	file.write((const char*)&a,1);
+	file.write((const char*)&b,1);
+	atomize(dimz,a,b);
+	file.write((const char*)&a,1);
+	file.write((const char*)&b,1);
+
+	for(int x=1;x<=dimx;++x)
+	for(int y=1;y<=dimy;++y)
+	for(int z=1;z<=dimz;++z)
+	{
+		uint8_t a=filled[x][y][z];
+		uint8_t b=texture[x][y][z];
+		file.write((const char*)&a,1);
+		file.write((const char*)&b,1);
+	}
+
+	file.close();
+}
+void Grid::loadFromFile(string filename)
+{
+	ifstream file(filename.c_str(),ios::in|ios::binary);
+	if (!file)
+	{
+		cerr << "error : impossible to open : " << filename <<endl;
+		return;
+	}
+	
+	uint8_t a[2];
+	int dimensionX,dimensionY,dimensionZ;
+
+	file.read((char*)a,1);
+
+	file.read(( char *)a,2); unize(dimensionX,a[0],a[1]);
+	file.read(( char *)a,2); unize(dimensionY,a[0],a[1]);
+	file.read(( char *)a,2); unize(dimensionZ,a[0],a[1]);
+
+	cout<<dimensionX<<" "<<dimensionY<<" " <<dimensionZ<<endl;
+	set_dimension(dimensionX,dimensionY,dimensionZ);
+
+	for(int x=1;x<=dimx;++x)
+	for(int y=1;y<=dimy;++y)
+	for(int z=1;z<=dimz;++z)
+	{
+		file.read(( char *)a,2);
+		filled[x][y][z]=a[0];
+		texture[x][y][z]=a[1];
+	}
+
+	file.close();	
 }
