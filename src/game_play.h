@@ -35,13 +35,14 @@ class GamePlay
 		~GamePlay();
 
 		//----- Scene initilisation function ----//
-		void setProgram(GLuint shadowProgram, GLuint objectProgram);
+		void setProgram(GLuint shadowProgram, GLuint objectProgram, GLuint skyboxProgram);
 		
 		void setScreen(sf::RenderWindow* w);
 
 		//-----Network-PlayerGroup-----//
 		void setPlayerGroup(PlayerGroup* p);
 
+		void setSkyboxTextureId(GLuint id);
 	private:
 		Grid* grid;
 		Scene scene;
@@ -54,6 +55,7 @@ class GamePlay
 
 		GLuint objectProgram;
 		GLuint shadowProgram;
+		GLuint skyboxProgram;
 		
 		sf::RenderWindow* window;
 		//----- Helper member function -------//

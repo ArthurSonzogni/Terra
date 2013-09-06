@@ -10,6 +10,9 @@ Scene::Scene():
 	light_matrix_on_shadow_id(0),
 	modelview_on_object_id(0),
 	modelview_on_shadow_id(0),
+	skybox_tex_id(0),
+	skybox_mat_id(0),
+	skybox_texture_id(0),
 	currentMode(BINDFORSHADOW)
 {
 	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.  
@@ -98,7 +101,7 @@ void Scene::bindForObject()
 
 	glViewport(0,0,800,600);
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
 	glUseProgram(program_object);
 	
 	// sending information for light matrix
@@ -128,6 +131,35 @@ void Scene::bindForObject()
 
 }
 
+void Scene::bindForSkybox()
+{
+	currentMode=BINDFORSKYBOX;
+
+	glViewport(0,0,800,600);
+	glBindFramebuffer(GL_FRAMEBUFFER,0);
+	glUseProgram(program_skybox);
+
+	// resetting the modelview matrix
+	modelview_matrix=glm::mat4(1.0);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	
+	// sending information for camera matrix
+	glm::mat4 mat=camera_matrix*modelview_matrix;
+	mat[3][0]=0.0;
+	mat[3][1]=0.0;
+	mat[3][2]=0.0;
+	mat=camera_projection_matrix*mat;
+
+	glUniformMatrix4fv(skybox_mat_id,1,GL_FALSE,&(mat[0][0]));
+	
+	// sending tex
+	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(skybox_tex_id,0);
+	
+}
+
 void Scene::setShadowProgram(GLuint program)
 {
 	program_shadow=program;
@@ -151,12 +183,24 @@ void Scene::setObjectProgram(GLuint program)
 	modelview_on_object_id=glGetUniformLocation(program,"modelview_mat");
 }
 
+void Scene::setSkyBoxProgram(GLuint program)
+{
+	glUseProgram(program);
+	program_skybox=program;
+
+	// getting id
+	skybox_mat_id=glGetUniformLocation(program,"mat");	
+	skybox_tex_id=glGetUniformLocation(program,"tex");
+}
+
 void Scene::bindFor(int mode)
 {
-	if (mode==BINDFORSHADOW)
-		bindForShadow();
-	else
-		bindForObject();
+	switch (mode)
+	{
+		case BINDFORSHADOW: bindForShadow(); break;
+		case BINDFORSKYBOX: bindForSkybox(); break;
+		case BINDFOROBJECT: bindForObject(); break;
+	}
 }
 
 void Scene::setCameraMatrix(glm::mat4 camera)
@@ -213,4 +257,53 @@ void Scene::setCameraPosition(int x, int y, int z)
 int Scene::getBinding()
 {
 	return currentMode;
+}
+
+void Scene::setSkyboxTextureId(GLuint id)
+{
+	skybox_texture_id=id;
+}
+void Scene::performSkyboxDrawing()
+{
+	cout<<"hi"<<endl;
+	glBindTexture(GL_TEXTURE_2D, skybox_texture_id);
+	const float length_sup=1.0;
+	const float length_inf=1.0;
+	// Render the front quad
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 0); glVertex3f(  length_sup, -length_sup, -length_inf );
+		glTexCoord2f(0, 1); glVertex3f(  length_sup,  length_sup, -length_inf );
+		glTexCoord2f(1, 1); glVertex3f( -length_sup,  length_sup, -length_inf );
+		glTexCoord2f(1, 0); glVertex3f( -length_sup, -length_sup, -length_inf );
+
+	// Render the left quad
+		glTexCoord2f(0, 0); glVertex3f(  length_inf, -length_sup,  length_sup );
+		glTexCoord2f(0, 1); glVertex3f(  length_inf,  length_sup,  length_sup );
+		glTexCoord2f(1, 1); glVertex3f(  length_inf,  length_sup, -length_sup );
+		glTexCoord2f(1, 0); glVertex3f(  length_inf, -length_sup, -length_sup );
+
+	// Render the back quad
+		glTexCoord2f(0, 0); glVertex3f( -length_sup, -length_sup,  length_inf );
+		glTexCoord2f(0, 1); glVertex3f( -length_sup,  length_sup,  length_inf );
+		glTexCoord2f(1, 1); glVertex3f(  length_sup,  length_sup,  length_inf );
+		glTexCoord2f(1, 0); glVertex3f(  length_sup, -length_sup,  length_inf );
+
+	// Render the right quad
+		glTexCoord2f(0, 0); glVertex3f( -length_inf, -length_sup, -length_sup );
+		glTexCoord2f(0, 1); glVertex3f( -length_inf,  length_sup, -length_sup );
+		glTexCoord2f(1, 1); glVertex3f( -length_inf,  length_sup,  length_sup );
+		glTexCoord2f(1, 0); glVertex3f( -length_inf, -length_sup,  length_sup );
+
+	// Render the top quad
+		glTexCoord2f(1, 0); glVertex3f( -length_sup,  length_inf, -length_sup );
+		glTexCoord2f(0, 0); glVertex3f(  length_sup,  length_inf, -length_sup );
+		glTexCoord2f(0, 1); glVertex3f(  length_sup,  length_inf,  length_sup );
+		glTexCoord2f(1, 1); glVertex3f( -length_sup,  length_inf,  length_sup );
+
+	// Render the bottom quad
+		glTexCoord2f(0, 0); glVertex3f( -length_sup, -length_inf, -length_sup );
+		glTexCoord2f(0, 1); glVertex3f( -length_sup, -length_inf,  length_sup );
+		glTexCoord2f(1, 1); glVertex3f(  length_sup, -length_inf,  length_sup );
+		glTexCoord2f(1, 0); glVertex3f(  length_sup, -length_inf, -length_sup );
+	glEnd();
 }

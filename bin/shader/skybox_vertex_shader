@@ -1,0 +1,8 @@
+uniform sampler2D tex;
+uniform mat4 mat;
+
+void main(void)
+{
+	gl_TexCoord[0] = gl_MultiTexCoord0;
+	gl_Position = mat * gl_Vertex;
+}

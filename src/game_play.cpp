@@ -13,14 +13,13 @@ void GamePlay::levelLoadFromGrid(Grid* g)
 	deleteGrid();
 	grid=g->allocCopy();
 
-	loadMesh();
 
 }
 
 //----- Execution function -------//
 void GamePlay::process()
 {
-	if (!grid||!window||!objectProgram||!shadowProgram||!playergroup)
+	if (!grid||!window||!objectProgram||!shadowProgram||!skyboxProgram||!playergroup)
 		return;
 	
 	
@@ -103,6 +102,7 @@ void GamePlay::process()
 		bowlReceptacle.pop_front();
 		cout<<position.x<<" "<<position.y<<" "<<position.z<<endl;
 		game_physic.add_sphere(position.x,position.y,position.z+0.5);
+		loadMesh();
 
 		// for each player sending every balls
 		for(int i=0;i<playergroup->getNbPlayer();++i)
@@ -159,6 +159,7 @@ void GamePlay::process()
 	mesh=grid->get_mesh();
 	game_physic.set_world_mesh(mesh);
 
+	
 
 
 	while(running)
@@ -257,52 +258,61 @@ void GamePlay::process()
 		{
 			// drawing grid
 			scene.bindFor(mode);
-			
-			GLint location = glGetUniformLocation(objectProgram, "tex");
-			glUniform1i(location,0);
-			glActiveTexture(GL_TEXTURE0);
-
-			grid->draw(scene);
-			
-			// drawing sphere
-			scene.pushModelViewMatrix();
+			if (mode==BINDFORSKYBOX)
 			{
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
+				scene.performSkyboxDrawing();
 			}
-			for(int i=0;i<game_physic.getNbSphere();++i)
+			
+			if (mode==BINDFOROBJECT or mode==BINDFORSHADOW)
 			{
-				btTransform tr=game_physic.get_sphere_transformation(i);
-				btScalar m[16];
-				tr.getOpenGLMatrix(m);
-				glm::mat4 mat=glm::mat4(
-						m[0],
-						m[1],
-						m[2],
-						m[3],
-						m[4],
-						m[5],
-						m[6],
-						m[7],
-						m[8],
-						m[9],
-						m[10],
-						m[11],
-						m[12],
-						m[13],
-						m[14],
-						m[15]
-				);
-				scene.setModelViewMatrix(mat);
-				scene.sendModelViewMatrix();
-				// drawing the sphere
-				GLUquadricObj *quadric=gluNewQuadric();
-				gluQuadricNormals(quadric, GLU_SMOOTH);
-				gluQuadricTexture(quadric, GL_TRUE);
-				gluSphere(quadric, 1.0f,20,20);
-				gluDeleteQuadric(quadric);
+				if (mode==BINDFOROBJECT)
+				{
+					GLint location = glGetUniformLocation(objectProgram, "tex");
+					glUniform1i(location,0);
+					glActiveTexture(GL_TEXTURE0);
+				}
+				grid->draw(scene);
+				
+				// drawing sphere
+				scene.pushModelViewMatrix();
+				{
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
+				}
+				for(int i=0;i<game_physic.getNbSphere();++i)
+				{
+					btTransform tr=game_physic.get_sphere_transformation(i);
+					btScalar m[16];
+					tr.getOpenGLMatrix(m);
+					glm::mat4 mat=glm::mat4(
+							m[0],
+							m[1],
+							m[2],
+							m[3],
+							m[4],
+							m[5],
+							m[6],
+							m[7],
+							m[8],
+							m[9],
+							m[10],
+							m[11],
+							m[12],
+							m[13],
+							m[14],
+							m[15]
+					);
+					scene.setModelViewMatrix(mat);
+					scene.sendModelViewMatrix();
+					// drawing the sphere
+					GLUquadricObj *quadric=gluNewQuadric();
+					gluQuadricNormals(quadric, GLU_SMOOTH);
+					gluQuadricTexture(quadric, GL_TRUE);
+					gluSphere(quadric, 1.0f,20,20);
+					gluDeleteQuadric(quadric);
+				}
+				scene.popModelViewMatrix();
 			}
-			scene.popModelViewMatrix();
 		}
 		window->display();
 
@@ -438,12 +448,14 @@ GamePlay::~GamePlay()
 }
 
 //----- Scene initilisation function ----//
-void GamePlay::setProgram(GLuint s, GLuint o)
+void GamePlay::setProgram(GLuint s, GLuint o, GLuint k)
 {
 	shadowProgram=s;
 	objectProgram=o;
+	skyboxProgram=k;
 	scene.setShadowProgram(shadowProgram);	
 	scene.setObjectProgram(objectProgram);
+	scene.setSkyBoxProgram(skyboxProgram);
 }
 
 void GamePlay::setScreen(sf::RenderWindow* w)
@@ -479,4 +491,9 @@ void GamePlay::loadMesh()
 	deleteMesh();
 	mesh=grid->get_mesh();	
 	game_physic.set_world_mesh(mesh);
+}
+
+void GamePlay::setSkyboxTextureId(GLuint id)
+{
+	scene.setSkyboxTextureId(id);
 }

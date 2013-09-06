@@ -11,9 +11,9 @@
 #include <list>
 using namespace std;
 
-
 #define BINDFORSHADOW 0
-#define BINDFOROBJECT 1
+#define BINDFORSKYBOX 1
+#define BINDFOROBJECT 2
 
 class Scene
 {
@@ -21,6 +21,7 @@ class Scene
 		float projection_matrix[4][4];
 		GLuint program_shadow;
 		GLuint program_object;
+		GLuint program_skybox;
 		GLuint shadow_framebuffer;
 		GLuint shadow_depthTexture;
 		GLuint shadowMap_id;
@@ -30,6 +31,9 @@ class Scene
 		GLuint light_matrix_on_shadow_id;
 		GLuint modelview_on_object_id;
 		GLuint modelview_on_shadow_id;
+		GLuint skybox_tex_id;
+		GLuint skybox_mat_id;
+		GLuint skybox_texture_id;
 		
 
 		glm::mat4 camera_projection_matrix;
@@ -41,17 +45,22 @@ class Scene
 
 		int currentMode;
 		list<glm::mat4> modelViewPool;
+		
+
 	public:
 		Scene();
 		~Scene();
 		
 		void bindForShadow();
 		void bindForObject();
+		void bindForSkybox();
+
 		void bindFor(int mode);
 		int getBinding();
 		
 		void setShadowProgram(GLuint program);
 		void setObjectProgram(GLuint program);
+		void setSkyBoxProgram(GLuint program);
 		
 		void setCameraMatrix(glm::mat4 camera);
 		
@@ -62,6 +71,9 @@ class Scene
 		void pushModelViewMatrix();
 		void popModelViewMatrix();
 		void setCameraPosition(int x, int y, int z);
+		
+		void setSkyboxTextureId(GLuint id);
+		void performSkyboxDrawing();
 };
 
 

@@ -39,7 +39,7 @@ void Game_editor::levelSaveToGrid()
 //----- Execution function -------//
 void Game_editor::process()
 {
-	if (!grid||!window||!objectProgram||!shadowProgram) return;
+	if (!grid||!window||!objectProgram||!shadowProgram||!shadowProgram) return;
 
 	bool running=true;
 	sf::Clock c;
@@ -149,12 +149,23 @@ void Game_editor::process()
 		{
 			scene.bindFor(mode);
 			
-			GLint location = glGetUniformLocation(objectProgram, "tex");
-			glUniform1i(location,0);
-			glActiveTexture(GL_TEXTURE0);
+			if (mode==BINDFORSKYBOX)
+			{
+				scene.performSkyboxDrawing();
+			}
+			
+			if (mode==BINDFOROBJECT or mode==BINDFORSHADOW)
+			{
+				if (mode==BINDFOROBJECT)
+				{
+					GLint location = glGetUniformLocation(objectProgram, "tex");
+					glUniform1i(location,0);
+					glActiveTexture(GL_TEXTURE0);
+				}
 
-			grid->draw_special(Grid::DRAW_STARTS_POINT|Grid::DRAW_END_POINT,scene);
-			grid->draw(scene);
+				grid->draw_special(Grid::DRAW_STARTS_POINT|Grid::DRAW_END_POINT,scene);
+				grid->draw(scene);
+			}
 			
 		}
 		game_editor_menu.draw();
@@ -179,6 +190,7 @@ Game_editor::Game_editor()
 	state=not_ready;
 	objectProgram=0;
 	shadowProgram=0;	
+	skyboxProgram=0;
 }
 Game_editor::~Game_editor()
 {
@@ -186,12 +198,14 @@ Game_editor::~Game_editor()
 }
 
 //----- Scene initilisation function ----//
-void Game_editor::setProgram(GLuint s, GLuint o)
+void Game_editor::setProgram(GLuint s, GLuint o, GLuint k)
 {
 	shadowProgram=s;
 	objectProgram=o;
+	skyboxProgram=k;
 	scene.setShadowProgram(shadowProgram);	
 	scene.setObjectProgram(objectProgram);
+	scene.setSkyBoxProgram(skyboxProgram);
 }
 
 void Game_editor::setScreen(sf::RenderWindow* w)
@@ -213,4 +227,9 @@ void Game_editor::deleteGrid()
 Grid* Game_editor::getGrid()
 {
 	return grid;
+}
+
+void Game_editor::setSkyboxTextureId(GLuint id)
+{
+	scene.setSkyboxTextureId(id);
 }

@@ -54,6 +54,7 @@ int main()
 	Shader shader;
 	GLuint programShadow=shader.loadProgram("shader/shadow_vertex_shader","shader/shadow_pixel_shader");
 	GLuint programObject=shader.loadProgram("shader/simple_vertex_shader","shader/simple_pixel_shader");
+	GLuint programSkybox=shader.loadProgram("shader/skybox_vertex_shader","shader/skybox_pixel_shader");
 
 	// opengl initialisation
 	glEnable(GL_DEPTH_TEST);
@@ -96,7 +97,8 @@ int main()
 		game_editor.levelLoadEmpty();
 		game_editor.getGrid()->loadFromFile("hiboux.t");
 		game_editor.setScreen(&window);
-		game_editor.setProgram(programShadow,programObject);
+		game_editor.setProgram(programShadow,programObject,programSkybox);
+		game_editor.setSkyboxTextureId(get_texture_id(texture_ball));
 		game_editor.process();
 
 		Grid* g=game_editor.getGrid();
@@ -110,8 +112,9 @@ int main()
 	GamePlay gamePlay;
 	gamePlay.levelLoadFromGrid(multiplayerLauncher.getGrid());
 	gamePlay.setScreen(&window);
-	gamePlay.setProgram(programShadow,programObject);
+	gamePlay.setProgram(programShadow,programObject,programSkybox);
 	gamePlay.setPlayerGroup(&playerGroup);
+	gamePlay.setSkyboxTextureId(get_texture_id(texture_ball));
 	gamePlay.process();
 
 	
@@ -148,7 +151,7 @@ int main()
 	
 	GamePlay gameplay;
 	gameplay.setScreen(&window);
-	gameplay.setProgram(programShadow,programObject);
+	gameplay.setProgram(programShadow,programObject,programSkybox);
 	gameplay.levelLoadFromGrid(&g);
 	PlayerGroup playergroup(true);
 	gameplay.setPlayerGroup(&playergroup);

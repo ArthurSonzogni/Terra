@@ -41,11 +41,11 @@ class Game_editor
 		~Game_editor();
 
 		//----- Scene initilisation function ----//
-		void setProgram(GLuint shadowProgram, GLuint objectProgram);
+		void setProgram(GLuint shadowProgram, GLuint objectProgram, GLuint skyboxProgram);
 		
 		void setScreen(sf::RenderWindow* w);
 		
-
+		void setSkyboxTextureId(GLuint id);
 	private:
 
 		Character_free_view character;
@@ -58,6 +58,7 @@ class Game_editor
 		
 		GLuint objectProgram;
 		GLuint shadowProgram;
+		GLuint skyboxProgram;
 		
 		sf::RenderWindow* window;
 
