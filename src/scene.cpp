@@ -1,5 +1,5 @@
 #include "scene.h"
-
+#include "texture.h"
 Scene::Scene():
 	program_shadow(0),
 	program_object(0),
@@ -265,45 +265,61 @@ void Scene::setSkyboxTextureId(GLuint id)
 }
 void Scene::performSkyboxDrawing()
 {
-	cout<<"hi"<<endl;
 	glBindTexture(GL_TEXTURE_2D, skybox_texture_id);
 	const float length_sup=1.0;
 	const float length_inf=1.0;
 	// Render the front quad
+	glBindTexture(GL_TEXTURE_2D, get_texture_id(texture_skybox_Bottom));
 	glBegin(GL_QUADS);
 		glTexCoord2f(0, 0); glVertex3f(  length_sup, -length_sup, -length_inf );
 		glTexCoord2f(0, 1); glVertex3f(  length_sup,  length_sup, -length_inf );
 		glTexCoord2f(1, 1); glVertex3f( -length_sup,  length_sup, -length_inf );
 		glTexCoord2f(1, 0); glVertex3f( -length_sup, -length_sup, -length_inf );
+	glEnd();
 
 	// Render the left quad
-		glTexCoord2f(0, 0); glVertex3f(  length_inf, -length_sup,  length_sup );
-		glTexCoord2f(0, 1); glVertex3f(  length_inf,  length_sup,  length_sup );
-		glTexCoord2f(1, 1); glVertex3f(  length_inf,  length_sup, -length_sup );
-		glTexCoord2f(1, 0); glVertex3f(  length_inf, -length_sup, -length_sup );
+	glBindTexture(GL_TEXTURE_2D, get_texture_id(texture_skybox_East));
+	glBegin(GL_QUADS);
+		glTexCoord2f(1, 0); glVertex3f(  length_inf, -length_sup,  length_sup );
+		glTexCoord2f(0, 0); glVertex3f(  length_inf,  length_sup,  length_sup );
+		glTexCoord2f(0, 1); glVertex3f(  length_inf,  length_sup, -length_sup );
+		glTexCoord2f(1, 1); glVertex3f(  length_inf, -length_sup, -length_sup );
+	glEnd();
 
 	// Render the back quad
+	glBindTexture(GL_TEXTURE_2D, get_texture_id(texture_skybox_Top));
+	glBegin(GL_QUADS);
 		glTexCoord2f(0, 0); glVertex3f( -length_sup, -length_sup,  length_inf );
 		glTexCoord2f(0, 1); glVertex3f( -length_sup,  length_sup,  length_inf );
 		glTexCoord2f(1, 1); glVertex3f(  length_sup,  length_sup,  length_inf );
 		glTexCoord2f(1, 0); glVertex3f(  length_sup, -length_sup,  length_inf );
 
+	glEnd();
+
 	// Render the right quad
-		glTexCoord2f(0, 0); glVertex3f( -length_inf, -length_sup, -length_sup );
-		glTexCoord2f(0, 1); glVertex3f( -length_inf,  length_sup, -length_sup );
-		glTexCoord2f(1, 1); glVertex3f( -length_inf,  length_sup,  length_sup );
-		glTexCoord2f(1, 0); glVertex3f( -length_inf, -length_sup,  length_sup );
+	glBindTexture(GL_TEXTURE_2D, get_texture_id(texture_skybox_West));
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex3f( -length_inf, -length_sup, -length_sup );
+		glTexCoord2f(1, 1); glVertex3f( -length_inf,  length_sup, -length_sup );
+		glTexCoord2f(1, 0); glVertex3f( -length_inf,  length_sup,  length_sup );
+		glTexCoord2f(0, 0); glVertex3f( -length_inf, -length_sup,  length_sup );
+	glEnd();
 
 	// Render the top quad
-		glTexCoord2f(1, 0); glVertex3f( -length_sup,  length_inf, -length_sup );
-		glTexCoord2f(0, 0); glVertex3f(  length_sup,  length_inf, -length_sup );
-		glTexCoord2f(0, 1); glVertex3f(  length_sup,  length_inf,  length_sup );
-		glTexCoord2f(1, 1); glVertex3f( -length_sup,  length_inf,  length_sup );
+	glBindTexture(GL_TEXTURE_2D, get_texture_id(texture_skybox_South));
+	glBegin(GL_QUADS);
+		glTexCoord2f(0, 1); glVertex3f( -length_sup,  length_inf, -length_sup );
+		glTexCoord2f(1, 1); glVertex3f(  length_sup,  length_inf, -length_sup );
+		glTexCoord2f(1, 0); glVertex3f(  length_sup,  length_inf,  length_sup );
+		glTexCoord2f(0, 0); glVertex3f( -length_sup,  length_inf,  length_sup );
+	glEnd();
 
 	// Render the bottom quad
-		glTexCoord2f(0, 0); glVertex3f( -length_sup, -length_inf, -length_sup );
-		glTexCoord2f(0, 1); glVertex3f( -length_sup, -length_inf,  length_sup );
-		glTexCoord2f(1, 1); glVertex3f(  length_sup, -length_inf,  length_sup );
-		glTexCoord2f(1, 0); glVertex3f(  length_sup, -length_inf, -length_sup );
+	glBindTexture(GL_TEXTURE_2D, get_texture_id(texture_skybox_North));
+	glBegin(GL_QUADS);
+		glTexCoord2f(1, 1); glVertex3f( -length_sup, -length_inf, -length_sup );
+		glTexCoord2f(1, 0); glVertex3f( -length_sup, -length_inf,  length_sup );
+		glTexCoord2f(0, 0); glVertex3f(  length_sup, -length_inf,  length_sup );
+		glTexCoord2f(0, 1); glVertex3f(  length_sup, -length_inf, -length_sup );
 	glEnd();
 }

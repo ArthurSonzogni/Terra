@@ -98,7 +98,7 @@ int main()
 		game_editor.getGrid()->loadFromFile("hiboux.t");
 		game_editor.setScreen(&window);
 		game_editor.setProgram(programShadow,programObject,programSkybox);
-		game_editor.setSkyboxTextureId(get_texture_id(texture_ball));
+		//game_editor.setSkyboxTextureId(get_texture_id(texture_skybox));
 		game_editor.process();
 
 		Grid* g=game_editor.getGrid();
@@ -114,7 +114,7 @@ int main()
 	gamePlay.setScreen(&window);
 	gamePlay.setProgram(programShadow,programObject,programSkybox);
 	gamePlay.setPlayerGroup(&playerGroup);
-	gamePlay.setSkyboxTextureId(get_texture_id(texture_ball));
+	//gamePlay.setSkyboxTextureId(get_texture_id(texture_skybox));
 	gamePlay.process();
 
 	

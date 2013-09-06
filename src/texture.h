@@ -17,6 +17,12 @@ enum texture_enum
 {
 	texture_block,
 	texture_ball,
+	texture_skybox_Bottom,
+	texture_skybox_North,
+	texture_skybox_South,
+	texture_skybox_Top,
+	texture_skybox_West,
+	texture_skybox_East,
 	texture_enum_max
 };
 

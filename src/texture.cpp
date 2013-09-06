@@ -9,7 +9,13 @@ using namespace sf;
 const char* texture_location[]=
 {
 	"image/text_block.jpg",
-	"image/text_ball.jpg"
+	"image/text_ball.jpg",
+	"image/skybox/Nidor_Bottom.jpg",
+	"image/skybox/Nidor_North.jpg",
+	"image/skybox/Nidor_South.jpg",
+	"image/skybox/Nidor_Top.jpg",
+	"image/skybox/Nidor_West.jpg",
+	"image/skybox/Nidor_East.jpg"
 };
 
 GLuint texture_id[texture_enum_max];
