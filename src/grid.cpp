@@ -301,6 +301,69 @@ void Grid::generate_display_list(int x,int y, int z)
 			// triangle draw
 			float texture_position[2];
 			texture_block_get_position(texture[x][y][z],texture_position);
+			if (triangle[0]==triangle[3] and triangle[3]==triangle[6])
+			{
+				glTexCoord2d(
+							texture_position[0]+triangle[1]*TEXT_X_INC2,
+							texture_position[1]+triangle[2]*TEXT_Y_INC2
+				);
+				glVertex3f(
+						triangle[0]+x,
+						triangle[1]+y,
+						triangle[2]+z
+				);
+				glTexCoord2d(
+							texture_position[0]+triangle[4]*TEXT_X_INC2,
+							texture_position[1]+triangle[5]*TEXT_Y_INC2
+				);
+				glVertex3f(
+						triangle[3]+x,
+						triangle[4]+y,
+						triangle[5]+z
+				);
+				glTexCoord2d(
+							texture_position[0]+triangle[7]*TEXT_X_INC2,
+							texture_position[1]+triangle[8]*TEXT_Y_INC2
+				);
+				glVertex3f(
+						triangle[6]+x,
+						triangle[7]+y,
+						triangle[8]+z
+				);
+
+			}
+			else if (triangle[1]==triangle[4] and triangle[4]==triangle[7])
+			{
+				glTexCoord2d(
+							texture_position[0]+triangle[0]*TEXT_X_INC2,
+							texture_position[1]+triangle[2]*TEXT_Y_INC2
+				);
+				glVertex3f(
+						triangle[0]+x,
+						triangle[1]+y,
+						triangle[2]+z
+				);
+				glTexCoord2d(
+							texture_position[0]+triangle[3]*TEXT_X_INC2,
+							texture_position[1]+triangle[5]*TEXT_Y_INC2
+				);
+				glVertex3f(
+						triangle[3]+x,
+						triangle[4]+y,
+						triangle[5]+z
+				);
+				glTexCoord2d(
+							texture_position[0]+triangle[6]*TEXT_X_INC2,
+							texture_position[1]+triangle[8]*TEXT_Y_INC2
+				);
+				glVertex3f(
+						triangle[6]+x,
+						triangle[7]+y,
+						triangle[8]+z
+				);
+
+			}
+			else
 			{
 				glTexCoord2d(
 							texture_position[0]+triangle[0]*TEXT_X_INC2,
