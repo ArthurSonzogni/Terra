@@ -272,6 +272,7 @@ void GamePlay::process()
 					glActiveTexture(GL_TEXTURE0);
 				}
 				grid->draw(scene);
+				grid->draw_special(Grid::DRAW_END_POINT,scene);
 				
 				// drawing sphere
 				scene.pushModelViewMatrix();

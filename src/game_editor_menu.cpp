@@ -177,28 +177,35 @@ void Game_editor_menu::draw_helper()
 	if (isFocusOn())
 	{
 		// draw item
-		draw_board(xStart+64*selectedSlot+32,yStart-64*2,64,64*2,128,true);
+		draw_board(xStart+64*selectedSlot+32,yStart-64*3,64,64*3,128,true);
 		
 		// first item : full block
 		sprite.setTextureRect(sf::IntRect(0,64,32,32));
-		sprite.setPosition(xStart+64*selectedSlot+48,yStart-64*2+16);
+		sprite.setPosition(xStart+64*selectedSlot+48,yStart-64*3+16);
 		screen->draw(sprite);
 		if (mouseClic and sprite.getGlobalBounds().contains(mouseX,mouseY))
 			slotContent[selectedSlot].type=SlotElementTypeBlock;
 
 		// second item : semi block
 		sprite.setTextureRect(sf::IntRect(32,64,32,32));
-		sprite.setPosition(xStart+64*selectedSlot+48,yStart-64*2+48);
+		sprite.setPosition(xStart+64*selectedSlot+48,yStart-64*3+48);
 		screen->draw(sprite);
 		if (mouseClic and sprite.getGlobalBounds().contains(mouseX,mouseY))
 			slotContent[selectedSlot].type=SlotElementTypeSemiBlock;
 		
 		// Third item : StartPoint
 		sprite.setTextureRect(sf::IntRect(64,64,32,32));
-		sprite.setPosition(xStart+64*selectedSlot+48,yStart-64*2+80);
+		sprite.setPosition(xStart+64*selectedSlot+48,yStart-64*3+80);
 		screen->draw(sprite);
 		if (mouseClic and sprite.getGlobalBounds().contains(mouseX,mouseY))
 			slotContent[selectedSlot].type=SlotElementTypeStartPoint;
+
+		// fourth item : EndPoint
+		sprite.setTextureRect(sf::IntRect(96,64,32,32));
+		sprite.setPosition(xStart+64*selectedSlot+48,yStart-64*3+112);
+		screen->draw(sprite);
+		if (mouseClic and sprite.getGlobalBounds().contains(mouseX,mouseY))
+			slotContent[selectedSlot].type=SlotElementTypeEndPoint;
 
 		//draw_board(10,10,screen->getSize().x-20,screen->getSize().y-64*3-10,128,true);
 		// texture

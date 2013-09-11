@@ -52,6 +52,10 @@ void Character_free_view::mouse_click(bool isLeft)
 			{
 				grid->block_start_point(rayx,rayy,rayz);
 			} break;
+			case SlotElementTypeEndPoint:
+			{
+				grid->block_end_point(rayx,rayy,rayz);
+			} break;
 		}
 	}
 	else
@@ -97,7 +101,7 @@ void Character_free_view::step()
 			} break;
 			case SlotElementTypeEndPoint:
 			{
-				grid->draw_block_ghost(false,rayx,rayy,rayz,1);
+				grid->draw_block_ghost(false,rayx,rayy,rayz,254);
 			} break;
 		}
 	}

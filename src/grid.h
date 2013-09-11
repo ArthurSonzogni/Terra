@@ -54,6 +54,7 @@ class Grid
 		int  ghost_block_z;
 		int  ghost_block_tex;
 		void draw_block_ghost_helper(Scene& scene);
+		float endPointAnimation;
 		
 	public:
 		Grid();
@@ -78,6 +79,7 @@ class Grid
 		};
 		void draw_special(unsigned int flag,Scene& scene);
 		void draw_special_start_point(int x, int y , int z, Scene& scene);
+		void draw_special_end_point(int x, int y , int z, Scene& scene);
 
 		btBvhTriangleMeshShape* get_mesh();
 		

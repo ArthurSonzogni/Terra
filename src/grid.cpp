@@ -16,7 +16,8 @@ Grid::Grid():
 	is_initiate(false),
 	filled(NULL),
 	texture(NULL),
-	display_list(0)
+	display_list(0),
+	endPointAnimation(0.0)
 {
 }
 
@@ -135,6 +136,7 @@ void Grid::block_semi_active(int xx, int yy, int zz, int text)
 	if (isPositionValid(xx,yy,zz))
 	{
 		if (filled[xx][yy][zz]==255) return;
+		if (filled[xx][yy][zz]==254) return;
 		
 		int n=0;
 		int x,y,z;
@@ -200,6 +202,8 @@ void Grid::draw(Scene& scene)
 
 	glCallList(display_list);
 	draw_block_ghost_helper(scene);
+	
+	endPointAnimation+=0.3;
 }
 
 
@@ -518,6 +522,10 @@ void Grid::draw_block_ghost_helper(Scene& scene)
 			{
 				draw_special_start_point(x,y,z,scene);
 			}
+			else if (ghost_block_tex==254)
+			{
+				draw_special_end_point(x,y,z,scene);
+			}
 			else
 			{
 				glActiveTexture(GL_TEXTURE0);
@@ -593,19 +601,8 @@ void Grid::get_dimension(int& Dimx, int& Dimy, int& Dimz)
 	Dimz=dimz;
 }
 
-void Grid::draw_special_start_point(int x, int y , int z, Scene& scene)
+void draw_simple_cube()
 {
-	//if (scene.getBinding()==BINDFORSHADOW) return;	
-
-	// setting up the transformation
-	glm::mat4 mat=glm::translate(glm::mat4(1.0),glm::vec3(x+0.5,y+0.5,z+1.0));
-	scene.pushModelViewMatrix();
-	scene.setModelViewMatrix(mat);
-	scene.sendModelViewMatrix();
-
-
-	// drawing the contener
-	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_block));
 	glBegin(GL_QUADS);
 
 	glTexCoord2f(0.0,0.0);
@@ -649,6 +646,23 @@ void Grid::draw_special_start_point(int x, int y , int z, Scene& scene)
 
 	glEnd();
 
+}
+
+void Grid::draw_special_start_point(int x, int y , int z, Scene& scene)
+{
+	//if (scene.getBinding()==BINDFORSHADOW) return;	
+
+	// setting up the transformation
+	glm::mat4 mat=glm::translate(glm::mat4(1.0),glm::vec3(x+0.5,y+0.5,z+1.0));
+	scene.pushModelViewMatrix();
+	scene.setModelViewMatrix(mat);
+	scene.sendModelViewMatrix();
+
+
+	// drawing the contener
+	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_block));
+	draw_simple_cube();
+
 	// drawing the sphere
 	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_ball));
 	GLUquadricObj *quadric=gluNewQuadric();
@@ -660,6 +674,33 @@ void Grid::draw_special_start_point(int x, int y , int z, Scene& scene)
 	// restaure default texture
 	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_block));
 	
+	scene.popModelViewMatrix();
+	scene.sendModelViewMatrix();
+
+}
+
+
+void Grid::draw_special_end_point(int x, int y , int z, Scene& scene)
+{
+	// setting up the transformation
+	glm::mat4 mat=glm::translate(glm::mat4(1.0),glm::vec3(x+0.5,y+0.5,z+1.0));
+	scene.pushModelViewMatrix();
+	scene.setModelViewMatrix(mat);
+	scene.sendModelViewMatrix();
+
+	// drawing the contener
+	glBindTexture(GL_TEXTURE_2D,get_texture_id(texture_block));
+	draw_simple_cube();
+	float s=1.0+0.4*(1.0+sin(endPointAnimation));
+	mat=glm::scale(glm::mat4(1.0),s*glm::vec3(1.0f,1.0f,1.0f));
+	mat=glm::rotate(mat,s*10,glm::vec3(1.0f,1.0f,1.0f));
+	scene.multModelViewMatrix(mat);
+	scene.sendModelViewMatrix();
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	draw_simple_cube();
+	glDisable(GL_BLEND);
+
 	scene.popModelViewMatrix();
 	scene.sendModelViewMatrix();
 
@@ -680,6 +721,14 @@ void Grid::draw_special(unsigned int flag, Scene& scene)
 			if (filled[x][y][z]==255)
 			{
 				draw_special_start_point(x,y,z,scene);
+			}
+		}
+		// draw End-Point
+		else if (b==254 && (flag|DRAW_END_POINT))
+		{
+			if (filled[x][y][z]==255)
+			{
+				draw_special_end_point(x,y,z,scene);
 			}
 		}
 	}

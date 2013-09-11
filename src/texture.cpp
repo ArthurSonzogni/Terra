@@ -10,12 +10,24 @@ const char* texture_location[]=
 {
 	"image/text_block.jpg",
 	"image/text_ball.jpg",
+	//"image/skybox/Nidor_Bottom.jpg",
+	//"image/skybox/Nidor_North.jpg",
+	//"image/skybox/Nidor_South.jpg",
+	//"image/skybox/Nidor_Top.jpg",
+	//"image/skybox/Nidor_West.jpg",
+	//"image/skybox/Nidor_East.jpg"
+	//"image/skybox/Nidor_Bottom.jpg",
+	//"image/skybox/dunes_back.jpg",
+	//"image/skybox/dunes_front.jpg",
+	//"image/skybox/dunes_top.jpg",
+	//"image/skybox/dunes_left.jpg",
+	//"image/skybox/dunes_right.jpg"
 	"image/skybox/Nidor_Bottom.jpg",
-	"image/skybox/Nidor_North.jpg",
-	"image/skybox/Nidor_South.jpg",
-	"image/skybox/Nidor_Top.jpg",
-	"image/skybox/Nidor_West.jpg",
-	"image/skybox/Nidor_East.jpg"
+	"image/skybox/clouds_back.jpg",
+	"image/skybox/clouds_front.jpg",
+	"image/skybox/clouds_top.jpg",
+	"image/skybox/clouds_left.jpg",
+	"image/skybox/clouds_right.jpg"
 };
 
 GLuint texture_id[texture_enum_max];
