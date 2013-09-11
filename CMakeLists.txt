@@ -20,9 +20,9 @@ target_link_libraries(terra BulletDynamics.so GLEW jpeg BulletCollision
 
 if ( CMAKE_COMPILER_IS_GNUCC )
     # This is tested
-    set_property( TARGET terra APPEND_STRING PROPERTY COMPILE_FLAGS -Wall )
+    set_property( TARGET terra  PROPERTY COMPILE_FLAGS -Wall )
 endif ( CMAKE_COMPILER_IS_GNUCC )
 if ( MSVC )
     # This is untested
-    set_property( TARGET terra APPEND_STRING PROPERTY COMPILE_FLAGS /W3 )
+    set_property( TARGET terra  PROPERTY COMPILE_FLAGS /W3 )
 endif ( MSVC )
